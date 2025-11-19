@@ -3,7 +3,7 @@
 
 Este repositório contém o desenvolvimento do Projeto Integrador I, cujo objetivo é criar uma plataforma que conecta produtores a mercados utilizando um selo de qualidade confiável (certificação digital), ampliando vendas seguras e agregando valor aos produtos.
 
----
+-
 
 ## 🧑‍💼 Cliente
 **Amazônia Marketing & Consultoria Ltda.**

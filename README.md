@@ -51,7 +51,7 @@ O objetivo é entregar um MVP funcional que demonstre os fluxos essenciais de ce
 
 | Integrante | Função |
 |-----------|--------|
-| **Dairon Romano** | (definir) |
-| **Renato Alho** | (definir) |
-| **Kezia Lima** | (definir) |
-| **Paulo Sérgio** | (definir) |
+| **Dairon Romano** | Master Scrum |
+| **Renato Alho** | Dev Team |
+| **Kezia Lima** | Dev Team |
+| **Paulo Sérgio** | Dev Team |

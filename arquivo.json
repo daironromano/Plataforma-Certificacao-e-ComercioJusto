@@ -1,0 +1,27 @@
+{
+    "product": {
+        "name": "Mel Orgânico da Mata",
+        "description": "Mel extraído de abelhas nativas...",
+        "price": "45.00",
+        "category": 1,
+        "stock_status": "EM_ESTOQUE",
+        "certification": {
+            "tech_sheet": [],
+            "invoice": [],
+            "photo_evidence": []
+        }
+    },
+    "records": [
+        {
+            "id": 10,
+            "product_name": "Mel Orgânico da Mata",
+            "producer_name": "João da Silva",
+            "status": "PENDING",
+            "auditor_notes": "",
+            "tech_sheet": "http://api.../media/docs/ficha.pdf",
+            "invoice": "http://api.../media/docs/nfe.pdf",
+            "photo_evidence": "http://api.../media/docs/foto.jpg"
+        }
+    ]
+}
+

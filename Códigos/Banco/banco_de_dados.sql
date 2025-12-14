@@ -2,7 +2,6 @@
 CREATE DATABASE IF NOT EXISTS amazonia_marketing;
 USE amazonia_marketing;
 
--- 1. Tabela Pai (Superclasse)
 -- Guarda os dados comuns a todos os perfis.
 CREATE TABLE Usuarios (
     -- Dados comuns

@@ -1,6 +1,6 @@
 -- --- INSERÇÃO DE DADOS  ---
 
--- 1. Inserindo Usuários (
+-- 1. Inserindo Usuários 
 -- Usuário 1: Um Produtor Rural (Dona Maria)
 INSERT INTO Usuarios (nome, email, telefone, endereco, senha, tipo, cpf) 
 VALUES ('Maria da Silva', 'maria.produtora@email.com', '91999999999', 'Sítio Esperança, Zona Rural', 'senha123', 'produtor', '12345678900');
@@ -20,7 +20,6 @@ VALUES
 ('Cesto de Palha', 'Artesanato', 'Cesto trançado manualmente com fibra natural.', 30.00, 'disponivel', 1);
 
 -- 3. Inserindo uma Certificação (Solicitação de Selo para o Mel - Produto ID 1)
--- O status começa como 'pendente' conforme regra de negócio
 INSERT INTO Certificacoes (texto_autodeclaracao, documento, status_certificacao, data_envio, produto_id) 
 VALUES ('Declaro que o mel é extraído sem aditivos químicos conforme normas.', 'laudo_mel_2025.pdf', 'pendente', '2025-12-13', 1);
 
@@ -33,7 +32,6 @@ VALUES ('Mercado Livre', 'Anuncio gerado automaticamente: Mel de Abelha Nativa -
 SELECT id_usuario, nome, tipo, email FROM Usuarios;
 
 -- Consulta: Relatório de Produtos com Nome do Produtor (Teste de Foreign Key)
-
 SELECT 
     p.nome AS Nome_Produto, 
     p.categoria, 

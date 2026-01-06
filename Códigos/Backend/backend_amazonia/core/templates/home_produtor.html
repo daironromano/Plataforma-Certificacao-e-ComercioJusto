@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1 style="color: green;">Área do Produtor Rural</h1>
+    <h2>Bem-vindo, {{ request.session.usuario_nome }}!</h2>
+    <p>Perfil detectado: {{ request.session.usuario_tipo }}</p>
+    <hr>
+    <p>Aqui você poderá cadastrar seus produtos e solicitar certificação.</p>
+    <br>
+    <a href="{% url 'logout' %}"><button>Sair (Logout)</button></a>
+</body>
+</html>

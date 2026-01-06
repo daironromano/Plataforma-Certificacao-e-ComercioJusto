@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1 style="color: blue;">Painel Administrativo (Auditoria)</h1>
+    <h2>Olá, {{ request.session.usuario_nome }}</h2>
+    <p>Matrícula Validada. Perfil: {{ request.session.usuario_tipo }}</p>
+    <hr>
+    <p>Lista de certificações pendentes para aprovação...</p>
+    <br>
+    <a href="{% url 'logout' %}"><button>Sair (Logout)</button></a>
+</body>
+</html>

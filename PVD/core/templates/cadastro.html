@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - Plataforma Certificação e Comércio Justo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .cadastro-container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+      width: 100%;
+      max-width: 450px;
+    }
+    .cadastro-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .cadastro-header h1 {
+      color: #667eea;
+      font-weight: bold;
+      font-size: 28px;
+    }
+    .cadastro-header p {
+      color: #666;
+      font-size: 14px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .form-control {
+      border: 2px solid #eee;
+      border-radius: 5px;
+      padding: 10px 15px;
+      font-size: 14px;
+    }
+    .form-control:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .btn-cadastro {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 5px;
+      font-weight: 500;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .btn-cadastro:hover {
+      background: linear-gradient(135deg, #5568d3 0%, #6a3f96 100%);
+      color: white;
+    }
+    .cadastro-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+    .cadastro-footer a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .cadastro-footer a:hover {
+      text-decoration: underline;
+    }
+    .errorlist, .help-text {
+      font-size: 12px;
+      color: #721c24;
+    }
+    .help-text {
+      color: #666;
+      margin-top: 5px;
+      display: block;
+    }
+    .form-errors {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      border-radius: 5px;
+      color: #721c24;
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="cadastro-container">
+    <div class="cadastro-header">
+      <h1>🌍 Criar Conta</h1>
+      <p>Plataforma de Certificação e Comércio Justo</p>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="form-errors">
+        {% for error in form.non_field_errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_username" class="form-label">Usuário:</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+          <div class="text-danger mt-2" style="font-size: 12px;">
+            {% for error in form.username.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="id_password1" class="form-label">Senha:</label>
+        {{ form.password1 }}
+        {% if form.password1.errors %}
+          <div class="text-danger mt-2" style="font-size: 12px;">
+            {% for error in form.password1.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+        {% if form.password1.help_text %}
+          <small class="help-text">{{ form.password1.help_text|safe }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="id_password2" class="form-label">Confirmar Senha:</label>
+        {{ form.password2 }}
+        {% if form.password2.errors %}
+          <div class="text-danger mt-2" style="font-size: 12px;">
+            {% for error in form.password2.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn-cadastro">Cadastrar</button>
+    </form>
+
+    <div class="cadastro-footer">
+      Já tem conta? <a href="/login/">Faça login aqui</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

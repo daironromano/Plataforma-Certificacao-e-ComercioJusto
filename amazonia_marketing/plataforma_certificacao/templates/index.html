@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazônia Marketing</title>
+
+</head>
+<body>
+    <header>
+        <div class="logo"> Amazônia Marketing </div>
+    <nav>
+        {% if usuario_logado %}
+            <span>Olá, <b>{{ usuario_logado }}</b></span>
+            {% if request.session.usuario_tipo == 'produtor' %}
+                <a href="{% url 'home_produtor' %}">Meus Produtos</a>
+            {% elif request.session.usuario_tipo == 'empresa' %}
+                <a href="{% url 'home_empresa' %}">Minhas Compras</a>
+            {% else %}
+                <a href="{% url 'home_admin' %}">Meu painel</a>
+            {% endif %}
+            <a href="{% url 'logout' %}">Sair</a>
+        {% else %}  
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+    </nav>
+</header>   
+
+<div class="hero">
+    <h1>Do campo para a mesa</h1>
+    <p>Produtos certificados e sustentáveis da Amazônia</p>
+</div>
+
+<div class="container">
+    <h2>Produtos em Destaque</h2>
+    <div class="grid">
+        {% for p in nome %}
+        <div class="card">
+            <div class="card-img">Foto</div>
+            <div class="card-body">
+                <h3>{{ p.nome }}</h3>
+                <p>{{ p.categoria }}</p>
+                <p class="preco"> R$ {{ p.preco }}</p>
+                <small>Produtor: {{ p.usuario.nome }}</small>
+            </div>
+        </div>
+        {% empty %}
+        <p>Nenhum produto disponível no momento</p>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>

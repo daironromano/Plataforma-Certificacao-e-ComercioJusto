@@ -18,10 +18,6 @@ class Certificacoes(models.Model):
     produto = models.ForeignKey('Produtos', models.DO_NOTHING)
     admin_responsavel = models.ForeignKey('Usuarios', models.DO_NOTHING, blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'certificacoes'
-
 
 class Marketplace(models.Model):
     id_anuncio = models.AutoField(primary_key=True)
@@ -29,10 +25,6 @@ class Marketplace(models.Model):
     conteudo_gerado = models.TextField(blank=True, null=True)
     data_geracao = models.DateField(blank=True, null=True)
     produto = models.ForeignKey('Produtos', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'marketplace'
 
 
 class Produtos(models.Model):
@@ -43,11 +35,7 @@ class Produtos(models.Model):
     preco = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     status_estoque = models.CharField(max_length=10, blank=True, null=True)
     usuario = models.ForeignKey('Usuarios', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'produtos'
-
+    
 
 class Usuarios(models.Model):
     id_usuario = models.AutoField(primary_key=True)
@@ -61,6 +49,3 @@ class Usuarios(models.Model):
     cnpj = models.CharField(max_length=18, blank=True, null=True)
     matricula = models.CharField(max_length=12, blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'usuarios'

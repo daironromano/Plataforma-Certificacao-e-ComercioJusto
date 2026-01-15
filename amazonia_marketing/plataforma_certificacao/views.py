@@ -1,9 +1,22 @@
 from django.shortcuts import render, redirect
 
 # Importamos a classe Usuarios que acabou de ser criada no models.py
-from .models import Usuarios
+from .models import Usuarios, Produtos
 
-# Função para fazer login no sistema
+
+# --- Função para exibir tela inicial ---
+def home_publica(request):
+    # Filtra apenas produtos disponíveis e armazena na variável
+    produtos_disponiveis = Produtos.objects.filter(status_estoque='diponivel')
+    # Dados que o frontend precisa receber 
+    dados_front = {
+        'produtos': produtos_disponiveis,
+        'usuario_logado': request.session.get('usuario_nome'),
+    }
+
+    return render(request, 'index.html', dados_front)
+
+# --- Função para fazer login no sistema ---
 def login_usuarios(request):
     msg = None
     if request.method == 'POST':
@@ -21,7 +34,6 @@ def login_usuarios(request):
             request.session['usuario_nome'] = usuario.nome
             
             # Lógica para redicionar o usuário de acordo com o seu tipo
-            
             if usuario.tipo == 'produtor':
                 return redirect('home_produtor')
             elif usuario.tipo == 'empresa':
@@ -37,7 +49,7 @@ def login_usuarios(request):
     
     return render(request, 'login.html', {'msg': msg })
            
-#Função para fazer login no sistema
+# --- Função para fazer login no sistema ---
 def login_usuarios(request):
     msg = None
     if request.method == 'POST':
@@ -70,7 +82,7 @@ def login_usuarios(request):
             # Se não achar ninguém com esse email/senha
             msg = "Usuário ou senha inválidos. Tente novamente."
 
-    return render(request, 'login.html', {'msg': msg})
+    return render(request, 'registration/login.html', {'msg': msg})
 
 # --- Função de Segurança (Decorador) ---
 # Se alguém tentar acessar direto pela URL sem logar, essa função chuta de volta.
@@ -109,17 +121,17 @@ def home_admin(request):
 def home_padrao(request):
     return render(request, 'home.html')
 
-# Função para deslogar o usuário
+# --- Função para deslogar o usuário ---
 def logout_view(request):
     # Limpa a sessão (desloga)
     request.session.flush()
     return redirect('login')
 
-# Função para cadastrar novo usuário
+# --- Função para cadastrar novo usuário ---
 
-# Função para adicionar certificação ao produto
+# ---  Função para adicionar certificação ao produto ---
 
-# Função para adicionar produtos
+# ---  Função para adicionar produtos ---
 
-# Função para empresa comprar produtos de produtor
+# ---  Função para empresa comprar produtos de produtor ---
 

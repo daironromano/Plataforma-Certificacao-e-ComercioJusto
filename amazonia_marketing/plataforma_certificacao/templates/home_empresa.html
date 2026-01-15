@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Amazônia</title>
+</head>
+<body>
+    <h1>Área da Empresa</h1>
+    <h2>Bem-vindo, {{request.session.usuario_nome }}</h2>
+    <p>Perfil detectado: {{ request.session.usuario_tipo }}</p>
+    <hr>
+    <p>Aqui você poderá visualizar produtos certificados e comprados</p>
+    <br>
+    <a href="{% url 'logout' %}"><button> SAIR </button></a>
+</body>
+</html>

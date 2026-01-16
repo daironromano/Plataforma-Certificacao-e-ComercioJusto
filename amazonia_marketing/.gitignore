@@ -1,0 +1,8 @@
+# Arquivosque não devem ir para o git
+
+__pychace__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+db.sqlite3

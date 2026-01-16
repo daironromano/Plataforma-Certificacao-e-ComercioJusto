@@ -24,7 +24,53 @@
         font-size: 20px;
         font-weight: bold;
        }
-
+       .bnt-login {
+        background: #2e7d32;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+       }
+       .banner {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 60px 20px;
+        margin-bottom: 40px;
+       }
+       /* Grid de produtos */
+       .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+       }
+       .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+       }
+       /*Card do produto*/
+       .card {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+       }
+       .card-img {
+        height: 200px;
+        background: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+       }
+       .card-body {
+        padding: 15px;;
+       }
+       .preco {
+        color: #2e7d32;
+        font-weight: bold;
+        font-size: 1.2rem;
+       }
     </style>
 </head>
 <body>
@@ -40,14 +86,14 @@
             {% else %}
                 <a href="{% url 'home_admin' %}">Meu painel</a>
             {% endif %}
-            <a href="{% url 'logout' %}">Sair</a>
+            <a class="bnt-login" href="{% url 'logout' %}">Sair</a>
         {% else %}  
-            <a href="{% url 'login' %}">Login</a>
+            <a class="bnt-login" href="{% url 'login' %}">Login</a>
         {% endif %}
     </nav>
 </header>   
 
-<div class="hero">
+<div class="banner">
     <h1>Do campo para a mesa</h1>
     <p>Produtos certificados e sustentáveis da Amazônia</p>
 </div>

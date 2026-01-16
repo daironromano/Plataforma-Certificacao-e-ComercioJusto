@@ -316,10 +316,6 @@
                         <div class="file-info">
                             <i class="bi bi-file-earmark"></i>
                             <strong>{{ certificacao.arquivo_autodeclaracao.name|truncatechars:50 }}</strong>
-                            <br>
-                            <small style="color: #666; margin-top: 8px; display: block;">
-                                Tamanho: {{ certificacao.arquivo_autodeclaracao.size|filesizeformat }}
-                            </small>
                             <a href="{% url 'baixar_arquivo_certificacao' certificacao.id_certificacao %}" class="file-link" style="margin-top: 10px; display: inline-block;">
                                 <i class="bi bi-download"></i> Baixar Arquivo
                             </a>
@@ -353,10 +349,10 @@
                         </div>
 
                         <div class="btn-group-action">
-                            <button type="submit" name="acao" value="aprovar" class="btn btn-approve">
+                            <button type="submit" name="acao" value="aprovada" class="btn btn-approve">
                                 <i class="bi bi-check-circle"></i> Aprovar Certificação
                             </button>
-                            <button type="submit" name="acao" value="rejeitar" class="btn btn-reject">
+                            <button type="submit" name="acao" value="rejeitada" class="btn btn-reject">
                                 <i class="bi bi-x-circle"></i> Rejeitar Certificação
                             </button>
                         </div>

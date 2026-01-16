@@ -252,16 +252,19 @@
                         {% endif %}
 
                         <!-- Arquivo Anexado -->
-                        {% if cert.arquivo_autodeclaracao %}
+                        {% if cert.arquivo_autodeclaracao and cert.arquivo_existe %}
                             <div class="file-info">
                                 <i class="bi bi-file-earmark"></i>
                                 <strong>Arquivo anexado:</strong>
                                 <a href="{% url 'baixar_arquivo_certificacao' cert.id_certificacao %}" class="file-link" title="Clique para baixar">
                                     {{ cert.arquivo_autodeclaracao.name|truncatechars:50 }}
                                 </a>
-                                <small style="color: #999; display: block; margin-top: 5px;">
-                                    Tamanho: {{ cert.arquivo_autodeclaracao.size|filesizeformat }}
-                                </small>
+                            </div>
+                        {% elif cert.arquivo_autodeclaracao %}
+                            <div class="file-info" style="color: #999;">
+                                <i class="bi bi-exclamation-circle"></i>
+                                <strong>Arquivo não encontrado</strong>
+                                <small>O arquivo foi removido ou movido do servidor.</small>
                             </div>
                         {% endif %}
 

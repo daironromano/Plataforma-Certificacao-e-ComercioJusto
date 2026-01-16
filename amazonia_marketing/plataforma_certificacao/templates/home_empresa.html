@@ -1,15 +1,217 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <title>Login - Amazônia</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel da Empresa - Amazônia Marketing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #4CAF50 !important;
+            font-size: 24px;
+        }
+        .dashboard-header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .stat-card h6 {
+            color: #999;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .stat-card .number {
+            color: #667eea;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .btn-custom {
+            background-color: #667eea;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: #764ba2;
+            color: white;
+        }
+        .feature-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        .feature-icon {
+            font-size: 32px;
+            color: #667eea;
+            margin-right: 20px;
+            min-width: 50px;
+            text-align: center;
+        }
+        .feature-text h5 {
+            color: #333;
+            margin: 0 0 5px 0;
+        }
+        .feature-text p {
+            color: #999;
+            margin: 0;
+            font-size: 14px;
+        }
+        footer {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Área da Empresa</h1>
-    <h2>Bem-vindo, {{request.session.usuario_nome }}</h2>
-    <p>Perfil detectado: {{ request.session.usuario_tipo }}</p>
-    <hr>
-    <p>Aqui você poderá visualizar produtos certificados e comprados</p>
-    <br>
-    <a href="{% url 'logout' %}"><button> SAIR </button></a>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-leaf"></i> Amazônia Marketing
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="nav-link">{{ request.session.usuario_nome }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Sair
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h1 class="mb-2">
+                <i class="bi bi-building"></i> Painel da Empresa
+            </h1>
+            <p class="text-muted">Gerencie seus produtos certificados e processos de compra</p>
+        </div>
+
+        <!-- Features Section -->
+        <div class="feature-section">
+            <h3 class="mb-4">
+                <i class="bi bi-star-fill"></i> Funcionalidades Disponíveis
+            </h3>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="bi bi-search"></i>
+                </div>
+                <div class="feature-text">
+                    <h5>Visualizar Produtos Certificados</h5>
+                    <p>Acesse o catálogo completo de produtos certificados por produtores e filtrados por categoria</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="bi bi-cart-check"></i>
+                </div>
+                <div class="feature-text">
+                    <h5>Realizar Compras</h5>
+                    <p>Compre diretamente de produtores certificados com garantia de qualidade e procedência</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="bi bi-file-earmark-check"></i>
+                </div>
+                <div class="feature-text">
+                    <h5>Verificar Certificações</h5>
+                    <p>Confirme a autenticidade e status de certificação de cada produto antes de comprar</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="bi bi-graph-up"></i>
+                </div>
+                <div class="feature-text">
+                    <h5>Acompanhar Pedidos</h5>
+                    <p>Monitore o status de seus pedidos e histórico de compras de forma segura</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coming Soon Section -->
+        <div class="row mb-5">
+            <div class="col-md-12">
+                <div style="background: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                    <h4 class="text-muted mb-3">
+                        <i class="bi bi-wrench"></i> Em Desenvolvimento
+                    </h4>
+                    <p class="text-muted">Estamos trabalhando para adicionar mais funcionalidades ao seu painel.</p>
+                    <p class="text-muted" style="font-size: 13px; color: #bbb;">
+                        Em breve você poderá gerenciar compras, visualizar pedidos e acessar histórico completo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Amazônia Marketing. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -79,8 +79,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # FORÇAR A USAR MYSQL
         'NAME': 'amazonia_marketing',          # Nome exato do banco que criamos
-        'USER': 'root',                        # Seu usuário do MySQL
-        'PASSWORD': 'admin',                   # Senha
+        'USER': 'django_user',                 # Seu usuário do MySQL
+        'PASSWORD': 'django123',               # Senha
         'HOST': '127.0.0.1',                   # Localhost
         'PORT': '3306',                        # Porta padrão
     }
@@ -130,3 +130,18 @@ MEDIA_URL = '/media/'
 
 # Endereço físico do meu computador - > fotos serão guardadas na pasta media
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Configurações de Upload de Arquivos
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB em bytes
+
+# Extensões permitidas para upload
+ALLOWED_UPLOAD_EXTENSIONS = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
+
+# MIME types permitidos para upload
+ALLOWED_UPLOAD_MIME_TYPES = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'image/jpeg',
+    'image/png',
+]

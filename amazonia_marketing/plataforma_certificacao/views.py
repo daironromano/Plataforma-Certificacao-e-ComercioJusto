@@ -12,56 +12,20 @@ from .forms import ProdutoComAutodeclaracaoForm, CertificacaoForm
 def login_usuarios(request):
     msg = None
     if request.method == 'POST':
-        email_form = request.POST.get('email')
-        senha_form = request.POST.get('senha')
-        
-        # BUSCAR NO BANCO
-        try:
-            # Procura o usuário que tentou fazer o login no banco de dados
-            usuario = Usuarios.objects.get(email=email_form, senha=senha_form)
-            
-            # Usuário existe: salva os dados da sessão 
-            request.session['usuario_id'] = usuario.id_usuario
-            request.session['usuario_tipo'] = usuario.tipo
-            request.session['usuario_nome'] = usuario.nome
-            
-            # Lógica para redicionar o usuário de acordo com o seu tipo
-            
-            if usuario.tipo == 'produtor':
-                return redirect('home_produtor')
-            elif usuario.tipo == 'empresa':
-                return redirect('home_empresa')
-            elif usuario.tipo == 'admin':
-                return redirect('home_admin')
-            else:
-                return redirect('home_padrao')
-            
-        # Caso não encontre ninguém com o email ou senha inseridos    
-        except Usuarios.DoesNotExist:
-            msg = 'Usuário ou senha inválidos. Tente novamente'
-    
-    return render(request, 'login.html', {'msg': msg })
-           
-#Função para fazer login no sistema
-def login_usuarios(request):
-    msg = None
-    if request.method == 'POST':
-        # Pega os dados do formulário HTML.
+        # Pega os dados do formulário HTML
         email_form = request.POST.get('email')
         senha_form = request.POST.get('senha')
         
         try:
-            # BUSCA NO BANCO:
-            # Procura um usuario onde o email e a senha correspondem com o formulário.
+            # Procura um usuario onde o email e a senha correspondem com o formulário
             usuario = Usuarios.objects.get(email=email_form, senha=senha_form)
             
-            # SUCESSO! Salva os dados na "sessão" (memória do navegador).
+            # SUCESSO! Salva os dados na "sessão" (memória do navegador)
             request.session['usuario_id'] = usuario.id_usuario
             request.session['usuario_tipo'] = usuario.tipo
             request.session['usuario_nome'] = usuario.nome
             
-            # LÓGICA DE REDIRECIONAMENTO (O requisito da Sprint 3).
-            # Verifica o campo 'tipo' que veio do banco de dados
+            # Redirecionamento baseado no tipo de usuário
             if usuario.tipo == 'produtor':
                 return redirect('home_produtor')
             elif usuario.tipo == 'admin':
@@ -159,7 +123,14 @@ def home_admin(request):
 
 @verificar_autenticacao
 def home_padrao(request):
-    return render(request, 'home.html')
+    """
+    Página padrão de início para usuários autenticados.
+    """
+    context = {
+        'usuario_nome': request.session.get('usuario_nome'),
+        'usuario_tipo': request.session.get('usuario_tipo'),
+    }
+    return render(request, 'home.html', context)
 
 # Função para deslogar o usuário
 def logout_view(request):
@@ -252,6 +223,17 @@ def ver_certificacoes(request):
     produtos_produtor = Produtos.objects.filter(usuario_id=usuario_id)
     certificacoes = Certificacoes.objects.filter(produto__in=produtos_produtor).order_by('-data_envio')
     
+    # Adicionar flag para cada certificação indicando se o arquivo existe
+    for cert in certificacoes:
+        if cert.arquivo_autodeclaracao:
+            try:
+                # Verificar se o arquivo físico existe
+                cert.arquivo_existe = cert.arquivo_autodeclaracao.storage.exists(cert.arquivo_autodeclaracao.name)
+            except:
+                cert.arquivo_existe = False
+        else:
+            cert.arquivo_existe = False
+    
     context = {
         'certificacoes': certificacoes,
         'usuario_nome': request.session.get('usuario_nome'),
@@ -312,6 +294,7 @@ def admin_visualizar_certificacoes(request):
 def admin_responder_certificacao(request, certificacao_id):
     """
     View para admin aprovar/rejeitar uma certificação.
+    Atualiza o status para 'aprovado' ou 'rejeitado' e registra a data e admin.
     """
     # Segurança: Garante que só ADMIN entra aqui
     if request.session.get('usuario_tipo') != 'admin':
@@ -325,7 +308,7 @@ def admin_responder_certificacao(request, certificacao_id):
         acao = request.POST.get('acao')
         comentario = request.POST.get('comentario', '')
         
-        # Aceitar tanto 'aprovado'/'rejeitado' quanto 'aprovada'/'rejeitada' 
+        # Aceitar valores de ação
         if acao in ['aprovar', 'aprovado', 'aprovada']:
             certificacao.status_certificacao = 'aprovado'
             certificacao.data_resposta = datetime.now().date()
@@ -334,7 +317,7 @@ def admin_responder_certificacao(request, certificacao_id):
             
             messages.success(
                 request, 
-                f'Certificação aprovada com sucesso! Produto: {certificacao.produto.nome}'
+                f'✅ Certificação APROVADA com sucesso! Produto: {certificacao.produto.nome}'
             )
             return redirect('admin_visualizar_certificacoes')
             
@@ -346,7 +329,7 @@ def admin_responder_certificacao(request, certificacao_id):
             
             messages.warning(
                 request,
-                f'Certificação rejeitada. Produto: {certificacao.produto.nome}'
+                f'❌ Certificação REJEITADA. Produto: {certificacao.produto.nome}'
             )
             return redirect('admin_visualizar_certificacoes')
         else:

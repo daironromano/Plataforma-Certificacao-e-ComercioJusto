@@ -11,6 +11,7 @@ class Certificacoes(models.Model):
     id_certificacao = models.AutoField(primary_key=True)
     texto_autodeclaracao = models.TextField(blank=True, null=True)
     documento = models.CharField(max_length=255)
+    arquivo_autodeclaracao = models.FileField(upload_to='autodeclaracoes/%Y/%m/%d/', blank=True, null=True)
     status_certificacao = models.CharField(max_length=9, blank=True, null=True)
     data_envio = models.DateField(blank=True, null=True)
     data_resposta = models.DateField(blank=True, null=True)
@@ -20,7 +21,6 @@ class Certificacoes(models.Model):
      # Diz para o django que essa tabela já existe e se chama 'Certificações'
      # Managed = False: desabilita o comportamento padrão do django: ele acha que é o dono do banco.
     class Meta:
-        managed = False
         db_table = 'Certificacoes'
 
 
@@ -32,7 +32,6 @@ class Marketplace(models.Model):
     produto = models.ForeignKey('Produtos', models.DO_NOTHING)
 
     class Meta:
-        managed = False
         db_table = 'Marketplace'
 
 class Produtos(models.Model):
@@ -45,7 +44,6 @@ class Produtos(models.Model):
     usuario = models.ForeignKey('Usuarios', models.DO_NOTHING)
     
     class Meta:
-        managed = False
         db_table = 'Produtos'
     
 
@@ -63,5 +61,4 @@ class Usuarios(models.Model):
 
     # Diz para o django que essa tabela já existe e se chama 'Usuário'
     class Meta:
-        managed = False
         db_table = 'Usuarios'

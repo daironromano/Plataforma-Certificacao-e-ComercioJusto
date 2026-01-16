@@ -28,6 +28,8 @@ venv/
 ENV/
 env/
 .venv
+.env/local/
+.env/example/
 
 # IDE & Editor
 .vscode/

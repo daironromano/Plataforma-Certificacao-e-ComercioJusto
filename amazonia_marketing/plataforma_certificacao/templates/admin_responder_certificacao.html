@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisar Certificação - Plataforma de Certificação</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container-main {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .nav-header {
+            background: #28a745;
+            padding: 15px 20px;
+            color: white;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-header a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        .nav-header a:hover {
+            color: #e3f2fd;
+        }
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #28a745;
+        }
+        .page-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+            border-radius: 8px 8px 0 0;
+            padding: 20px;
+        }
+        .card-header h5 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .card-body {
+            padding: 25px;
+        }
+        .info-section {
+            margin-bottom: 30px;
+        }
+        .info-section h6 {
+            color: #333;
+            font-weight: 700;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e3f2fd;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #333;
+            min-width: 150px;
+        }
+        .info-value {
+            color: #666;
+            text-align: right;
+            flex-grow: 1;
+        }
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-pendente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-aprovada {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-rejeitada {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .text-content {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        .file-info {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border-left: 4px solid #007bff;
+        }
+        .file-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .file-link:hover {
+            text-decoration: underline;
+        }
+        .decision-form {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #28a745;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .form-control, .form-select {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+        .btn-group-action {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-group-action button {
+            flex: 1;
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 5px;
+        }
+        .btn-approve {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+        .btn-approve:hover {
+            background-color: #1e7e34;
+        }
+        .btn-reject {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+        .btn-reject:hover {
+            background-color: #c82333;
+        }
+        .alert {
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-main">
+        <!-- Navegação -->
+        <div class="nav-header">
+            <span><i class="bi bi-shield-check"></i> Admin - Olá, {{ usuario_nome }}</span>
+            <div>
+                <a href="{% url 'admin_visualizar_certificacoes' %}">Voltar</a>
+                <a href="{% url 'logout' %}">Sair</a>
+            </div>
+        </div>
+
+        <!-- Mensagens -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-circle"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Header -->
+        <div class="page-header">
+            <h1><i class="bi bi-file-earmark-check"></i> Analisar Certificação</h1>
+            <p>Revise e aprove ou rejeite a autodeclaração enviada</p>
+        </div>
+
+        <!-- Informações da Certificação -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Informações da Solicitação</h5>
+            </div>
+            <div class="card-body">
+                <!-- Status Atual -->
+                <div class="info-row">
+                    <span class="info-label"><i class="bi bi-flag"></i> Status Atual:</span>
+                    <span class="info-value">
+                        <span class="status-badge status-{{ certificacao.status_certificacao }}">
+                            {{ certificacao.get_status_certificacao_display|default:certificacao.status_certificacao|title }}
+                        </span>
+                    </span>
+                </div>
+
+                <!-- Produto -->
+                <div class="info-row">
+                    <span class="info-label"><i class="bi bi-box-seam"></i> Produto:</span>
+                    <span class="info-value"><strong>{{ certificacao.produto.nome }}</strong></span>
+                </div>
+
+                <!-- Categoria -->
+                <div class="info-row">
+                    <span class="info-label"><i class="bi bi-tag"></i> Categoria:</span>
+                    <span class="info-value">{{ certificacao.produto.categoria }}</span>
+                </div>
+
+                <!-- Descrição -->
+                {% if certificacao.produto.descricao %}
+                    <div class="info-row">
+                        <span class="info-label"><i class="bi bi-file-text"></i> Descrição:</span>
+                        <div style="flex-grow: 1; text-align: right;">
+                            <small style="color: #666; display: block;">{{ certificacao.produto.descricao|truncatewords:30 }}</small>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Produtor -->
+                <div class="info-row">
+                    <span class="info-label"><i class="bi bi-person-circle"></i> Produtor:</span>
+                    <span class="info-value">{{ certificacao.produto.usuario.nome }}</span>
+                </div>
+
+                <!-- Email Produtor -->
+                <div class="info-row">
+                    <span class="info-label"><i class="bi bi-envelope"></i> Email:</span>
+                    <span class="info-value">{{ certificacao.produto.usuario.email }}</span>
+                </div>
+
+                <!-- Data de Envio -->
+                <div class="info-row">
+                    <span class="info-label"><i class="bi bi-calendar-event"></i> Data de Envio:</span>
+                    <span class="info-value">
+                        {% if certificacao.data_envio %}
+                            {{ certificacao.data_envio|date:"d/m/Y" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </span>
+                </div>
+
+                <!-- Data de Resposta -->
+                <div class="info-row">
+                    <span class="info-label"><i class="bi bi-calendar-check"></i> Data de Resposta:</span>
+                    <span class="info-value">
+                        {% if certificacao.data_resposta %}
+                            {{ certificacao.data_resposta|date:"d/m/Y" }}
+                        {% else %}
+                            Aguardando análise
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Autodeclaração -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-file-pdf"></i> Autodeclaração Enviada</h5>
+            </div>
+            <div class="card-body">
+                <!-- Texto da Autodeclaração -->
+                {% if certificacao.texto_autodeclaracao %}
+                    <div class="info-section">
+                        <h6><i class="bi bi-chat-left-text"></i> Texto da Autodeclaração</h6>
+                        <div class="text-content">
+                            {{ certificacao.texto_autodeclaracao|linebreaks }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Arquivo Anexado -->
+                {% if certificacao.arquivo_autodeclaracao %}
+                    <div class="info-section">
+                        <h6><i class="bi bi-file-earmark"></i> Arquivo Anexado</h6>
+                        <div class="file-info">
+                            <i class="bi bi-file-earmark"></i>
+                            <strong>{{ certificacao.arquivo_autodeclaracao.name|truncatechars:50 }}</strong>
+                            <br>
+                            <small style="color: #666; margin-top: 8px; display: block;">
+                                Tamanho: {{ certificacao.arquivo_autodeclaracao.size|filesizeformat }}
+                            </small>
+                            <a href="{% url 'baixar_arquivo_certificacao' certificacao.id_certificacao %}" class="file-link" style="margin-top: 10px; display: inline-block;">
+                                <i class="bi bi-download"></i> Baixar Arquivo
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Aviso se não houver conteúdo -->
+                {% if not certificacao.texto_autodeclaracao and not certificacao.arquivo_autodeclaracao %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> Nenhuma autodeclaração foi fornecida.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Formulário de Decisão -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-check-square"></i> Análise e Resposta</h5>
+            </div>
+            <div class="card-body">
+                {% if certificacao.status_certificacao == 'pendente' %}
+                    <form method="POST" id="form_resposta">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label for="comentario"><i class="bi bi-chat-left"></i> Comentário (Opcional)</label>
+                            <textarea class="form-control" id="comentario" name="comentario" rows="4" placeholder="Adicione um comentário sobre a análise..."></textarea>
+                            <small class="text-muted">Deixe em branco se não tiver comentários</small>
+                        </div>
+
+                        <div class="btn-group-action">
+                            <button type="submit" name="acao" value="aprovar" class="btn btn-approve">
+                                <i class="bi bi-check-circle"></i> Aprovar Certificação
+                            </button>
+                            <button type="submit" name="acao" value="rejeitar" class="btn btn-reject">
+                                <i class="bi bi-x-circle"></i> Rejeitar Certificação
+                            </button>
+                        </div>
+
+                        <a href="{% url 'admin_visualizar_certificacoes' %}" class="btn btn-secondary mt-3" style="width: 100%;">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                    </form>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Esta solicitação já foi processada</strong>
+                        <br>
+                        Status: <span class="status-badge status-{{ certificacao.status_certificacao }}">
+                            {{ certificacao.get_status_certificacao_display|default:certificacao.status_certificacao|title }}
+                        </span>
+                        {% if certificacao.data_resposta %}
+                            <br>Data de Resposta: {{ certificacao.data_resposta|date:"d/m/Y" }}
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'admin_visualizar_certificacoes' %}" class="btn btn-secondary" style="width: 100%;">
+                        <i class="bi bi-arrow-left"></i> Voltar para Lista
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Confirmação antes de submeter
+        document.getElementById('form_resposta') && document.getElementById('form_resposta').addEventListener('submit', function(e) {
+            const acao = e.submitter.value;
+            const mensagem = acao === 'aprovada' 
+                ? 'Tem certeza que deseja APROVAR esta certificação?' 
+                : 'Tem certeza que deseja REJEITAR esta certificação?';
+            
+            if (!confirm(mensagem)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

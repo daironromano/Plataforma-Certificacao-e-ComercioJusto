@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Certificações - Plataforma de Certificação</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container-main {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .nav-header {
+            background: #007bff;
+            padding: 15px 20px;
+            color: white;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-header a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        .nav-header a:hover {
+            color: #e3f2fd;
+        }
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #007bff;
+        }
+        .page-header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        .page-header p {
+            color: #666;
+            margin-bottom: 0;
+        }
+        .btn-novo {
+            margin-bottom: 20px;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .card-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border-radius: 8px 8px 0 0;
+            padding: 20px;
+        }
+        .card-header h5 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #333;
+            min-width: 150px;
+        }
+        .info-value {
+            color: #666;
+            text-align: right;
+            flex-grow: 1;
+        }
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-pendente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-aprovada {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-rejeitada {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .action-buttons {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .action-buttons a, .action-buttons button {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .empty-state i {
+            font-size: 64px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .empty-state p {
+            color: #999;
+            margin-bottom: 30px;
+        }
+        .alert {
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .file-info {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        .file-link {
+            color: #007bff;
+            text-decoration: none;
+            word-break: break-word;
+        }
+        .file-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-main">
+        <!-- Navegação -->
+        <div class="nav-header">
+            <span><i class="bi bi-house"></i> Olá, {{ usuario_nome }}</span>
+            <div>
+                <a href="{% url 'home_produtor' %}">Voltar</a>
+                <a href="{% url 'logout' %}">Sair</a>
+            </div>
+        </div>
+
+        <!-- Mensagens -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-circle"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Header da Página -->
+        <div class="page-header">
+            <h1><i class="bi bi-file-check"></i> Minhas Certificações</h1>
+            <p>Acompanhe o status das autodeclarações enviadas para seus produtos</p>
+        </div>
+
+        <!-- Botão de Nova Certificação -->
+        <a href="{% url 'enviar_autodeclaracao' %}" class="btn btn-success btn-novo">
+            <i class="bi bi-plus-circle"></i> Enviar Nova Autodeclaração
+        </a>
+
+        <!-- Lista de Certificações -->
+        {% if certificacoes %}
+            {% for cert in certificacoes %}
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h5>{{ cert.produto.nome }}</h5>
+                            <span class="status-badge status-{{ cert.status_certificacao }}">
+                                {{ cert.get_status_certificacao_display|default:cert.status_certificacao|title }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Informações do Produto -->
+                        <div class="info-row">
+                            <span class="info-label"><i class="bi bi-tag"></i> Categoria:</span>
+                            <span class="info-value">{{ cert.produto.categoria }}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label"><i class="bi bi-calendar-event"></i> Enviado em:</span>
+                            <span class="info-value">
+                                {% if cert.data_envio %}
+                                    {{ cert.data_envio|date:"d/m/Y" }}
+                                {% else %}
+                                    Sem data
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label"><i class="bi bi-calendar-check"></i> Resposta em:</span>
+                            <span class="info-value">
+                                {% if cert.data_resposta %}
+                                    {{ cert.data_resposta|date:"d/m/Y" }}
+                                {% else %}
+                                    Aguardando análise
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <!-- Texto da Autodeclaração -->
+                        {% if cert.texto_autodeclaracao %}
+                            <div class="info-row">
+                                <span class="info-label"><i class="bi bi-chat-left-text"></i> Texto:</span>
+                                <div style="flex-grow: 1; text-align: right;">
+                                    <small style="color: #666; display: block; word-break: break-word;">
+                                        {{ cert.texto_autodeclaracao|truncatewords:50 }}
+                                    </small>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Arquivo Anexado -->
+                        {% if cert.arquivo_autodeclaracao %}
+                            <div class="file-info">
+                                <i class="bi bi-file-earmark"></i>
+                                <strong>Arquivo anexado:</strong>
+                                <a href="{% url 'baixar_arquivo_certificacao' cert.id_certificacao %}" class="file-link" title="Clique para baixar">
+                                    {{ cert.arquivo_autodeclaracao.name|truncatechars:50 }}
+                                </a>
+                                <small style="color: #999; display: block; margin-top: 5px;">
+                                    Tamanho: {{ cert.arquivo_autodeclaracao.size|filesizeformat }}
+                                </small>
+                            </div>
+                        {% endif %}
+
+                        <!-- Informações do Admin -->
+                        {% if cert.admin_responsavel %}
+                            <div class="info-row" style="margin-top: 10px;">
+                                <span class="info-label"><i class="bi bi-person-badge"></i> Analisado por:</span>
+                                <span class="info-value">{{ cert.admin_responsavel.nome }}</span>
+                            </div>
+                        {% endif %}
+
+                        <!-- Botões de Ação -->
+                        <div class="action-buttons">
+                            {% if cert.arquivo_autodeclaracao %}
+                                <a href="{% url 'baixar_arquivo_certificacao' cert.id_certificacao %}" class="btn btn-sm btn-info">
+                                    <i class="bi bi-download"></i> Baixar Arquivo
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'home_produtor' %}" class="btn btn-sm btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <!-- Estado Vazio -->
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <h3>Nenhuma certificação enviada</h3>
+                <p>Você ainda não enviou nenhuma autodeclaração para certificação de seus produtos.</p>
+                <a href="{% url 'enviar_autodeclaracao' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Enviar Primeira Autodeclaração
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

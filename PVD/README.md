@@ -1,0 +1,1 @@
+# Plataforma-Certifica-o-e-ComercioJusto

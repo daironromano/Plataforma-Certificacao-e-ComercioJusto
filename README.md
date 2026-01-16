@@ -45,6 +45,7 @@ O objetivo é entregar um MVP funcional que demonstre os fluxos essenciais de ce
    - Status de produção  
    - Status de comercialização  
 4. **Geração de Anúncios Automáticos em Marketplaces**
+   - Marketing digital de produtores e empresas
 
 
 ## Equipe Alpha

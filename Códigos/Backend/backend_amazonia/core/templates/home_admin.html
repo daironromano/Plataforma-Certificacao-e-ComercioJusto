@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Amazônia Marketing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --admin-primary: #1565c0;
+            --admin-secondary: #1976d2;
+            --admin-warning: #f57c00;
+            --admin-success: #2e7d32;
+            --admin-danger: #c62828;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: linear-gradient(90deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+            font-size: 1.4rem;
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        
+        .welcome-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 4px solid;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .stat-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card.total {
+            border-top-color: var(--admin-primary);
+        }
+        .stat-card.total .icon { color: var(--admin-primary); }
+        
+        .stat-card.pending {
+            border-top-color: var(--admin-warning);
+        }
+        .stat-card.pending .icon { color: var(--admin-warning); }
+        
+        .stat-card.approved {
+            border-top-color: var(--admin-success);
+        }
+        .stat-card.approved .icon { color: var(--admin-success); }
+        
+        .stat-card.rejected {
+            border-top-color: var(--admin-danger);
+        }
+        .stat-card.rejected .icon { color: var(--admin-danger); }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-card p {
+            color: #666;
+            margin: 0;
+            font-size: 1rem;
+        }
+        
+        .action-btn {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-admin-primary {
+            background: linear-gradient(90deg, var(--admin-primary) 0%, var(--admin-secondary) 100%);
+            color: white;
+        }
+        
+        .cert-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border-left: 4px solid;
+        }
+        
+        .cert-card.pendente {
+            border-left-color: var(--admin-warning);
+        }
+        
+        .cert-card.aprovado {
+            border-left-color: var(--admin-success);
+        }
+        
+        .cert-card.rejeitado {
+            border-left-color: var(--admin-danger);
+        }
+        
+        .cert-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transform: translateX(5px);
+        }
+        
+        .status-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-pendente {
+            background-color: #fff3e0;
+            color: var(--admin-warning);
+        }
+        
+        .status-aprovado {
+            background-color: #e8f5e9;
+            color: var(--admin-success);
+        }
+        
+        .status-rejeitado {
+            background-color: #ffebee;
+            color: var(--admin-danger);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #999;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+        
+        .cert-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .cert-info i {
+            color: var(--admin-primary);
+            font-size: 1.2rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+<<<<<<< Updated upstream:Códigos/Backend/backend_amazonia/core/templates/home_admin.html
+    <h1 style="color: blue;">Painel Administrativo (Auditoria)</h1>
+    <h2>Olá, {{ request.session.usuario_nome }}</h2>
+    <p>Matrícula Validada. Perfil: {{ request.session.usuario_tipo }}</p>
+    <hr>
+    <p>Lista de certificações pendentes para aprovação...</p>
+    <br>
+    <a href="{% url 'logout' %}"><button>Sair (Logout)</button></a>
+=======
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home_admin' %}">
+                <i class="bi bi-shield-check"></i> Amazônia Marketing - Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'home_admin' %}">
+                            <i class="bi bi-house-door"></i> Início
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin_visualizar_certificacoes' %}">
+                            <i class="bi bi-list-check"></i> Todas as Certificações
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Sair
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="container mt-4">
+        <!-- Boas-vindas -->
+        <div class="welcome-section">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2">
+                        <i class="bi bi-shield-check text-primary"></i> 
+                        Painel Administrativo
+                    </h1>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-person-badge"></i> {{ usuario_nome }} | 
+                        <i class="bi bi-calendar3"></i> {% now "d/m/Y H:i" %}
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="badge bg-primary" style="font-size: 1rem; padding: 10px 20px;">
+                        <i class="bi bi-star-fill"></i> Administrador
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards de Estatísticas -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-card total text-center">
+                    <div class="icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <h3>{{ total_certificacoes }}</h3>
+                    <p>Total de Certificações</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card pending text-center">
+                    <div class="icon">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <h3>{{ pendentes }}</h3>
+                    <p>Aguardando Análise</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card approved text-center">
+                    <div class="icon">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <h3>{{ aprovadas }}</h3>
+                    <p>Aprovadas</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card rejected text-center">
+                    <div class="icon">
+                        <i class="bi bi-x-circle"></i>
+                    </div>
+                    <h3>{{ rejeitadas }}</h3>
+                    <p>Rejeitadas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ação Rápida -->
+        <div class="row mt-4 mb-4">
+            <div class="col-12">
+                <a href="{% url 'admin_visualizar_certificacoes' %}" class="btn btn-admin-primary action-btn w-100 btn-lg">
+                    <i class="bi bi-list-check"></i> Ver Todas as Certificações
+                </a>
+            </div>
+        </div>
+
+        <!-- Certificações Pendentes Recentes -->
+        <div class="welcome-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3>
+                    <i class="bi bi-clock-history text-warning"></i> Certificações Pendentes Recentes
+                </h3>
+                {% if pendentes > 0 %}
+                    <span class="badge bg-warning text-dark">{{ pendentes }} aguardando</span>
+                {% endif %}
+            </div>
+            
+            {% if certificacoes_recentes %}
+                <div class="row">
+                    {% for cert in certificacoes_recentes %}
+                        <div class="col-12">
+                            <div class="cert-card {{ cert.status_certificacao }}">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="cert-info">
+                                            <i class="bi bi-box-seam"></i>
+                                            <div>
+                                                <h5 class="mb-1">{{ cert.produto.nome }}</h5>
+                                                <small class="text-muted">{{ cert.produto.categoria }}</small>
+                                            </div>
+                                        </div>
+                                        <div class="cert-info">
+                                            <i class="bi bi-person"></i>
+                                            <span>{{ cert.produto.usuario.nome }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">
+                                            <i class="bi bi-calendar3"></i> {{ cert.data_envio|date:"d/m/Y" }}
+                                        </small>
+                                        <span class="status-badge status-{{ cert.status_certificacao }}">
+                                            {% if cert.status_certificacao == 'pendente' %}
+                                                <i class="bi bi-hourglass-split"></i> Pendente
+                                            {% elif cert.status_certificacao == 'aprovado' %}
+                                                <i class="bi bi-check-circle"></i> Aprovado
+                                            {% else %}
+                                                <i class="bi bi-x-circle"></i> Rejeitado
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="col-md-3 text-end">
+                                        <div class="action-buttons justify-content-end">
+                                            <a href="{% url 'admin_responder_certificacao' cert.id_certificacao %}" 
+                                               class="btn btn-sm btn-primary">
+                                                <i class="bi bi-eye"></i> Analisar
+                                            </a>
+                                            {% if cert.arquivo_autodeclaracao %}
+                                                <a href="{% url 'baixar_arquivo_certificacao' cert.id_certificacao %}" 
+                                                   class="btn btn-sm btn-info">
+                                                    <i class="bi bi-download"></i> Arquivo
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                {% if pendentes > 10 %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'admin_visualizar_certificacoes' %}" class="btn btn-outline-primary">
+                            Ver todas as {{ pendentes }} certificações pendentes
+                        </a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-check-circle"></i>
+                    <h4>Nenhuma certificação pendente</h4>
+                    <p>Todas as certificações foram analisadas!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+>>>>>>> Stashed changes:amazonia_marketing/plataforma_certificacao/templates/home_admin.html
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .navbar-custom {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .navbar-custom .navbar-brand {
+      font-weight: bold;
+      font-size: 20px;
+      color: white !important;
+    }
+    .navbar-custom .nav-link {
+      color: rgba(255, 255, 255, 0.9) !important;
+      transition: color 0.3s;
+    }
+    .navbar-custom .nav-link:hover {
+      color: white !important;
+    }
+    .sidebar {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .sidebar-item {
+      padding: 12px 15px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: #333;
+      text-decoration: none;
+      display: block;
+    }
+    .sidebar-item:hover {
+      background-color: #f0f0f0;
+      color: #28a745;
+      text-decoration: none;
+    }
+    .sidebar-item i {
+      margin-right: 10px;
+      width: 20px;
+    }
+    .card-custom {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card-custom:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+    .card-custom .card-header {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      border: none;
+      border-radius: 10px 10px 0 0;
+      padding: 20px;
+      font-weight: bold;
+    }
+    .welcome-message {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      padding: 40px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .welcome-message h1 {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .welcome-message p {
+      font-size: 16px;
+      opacity: 0.95;
+      margin-bottom: 0;
+    }
+    .btn-logout {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    .btn-logout:hover {
+      background: #c82333;
+      color: white;
+      text-decoration: none;
+    }
+    .stat-card {
+      text-align: center;
+      padding: 20px;
+    }
+    .stat-card .number {
+      font-size: 32px;
+      font-weight: bold;
+      color: #28a745;
+    }
+    .stat-card .label {
+      font-size: 14px;
+      color: #666;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">🔐 Administração</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <span class="nav-link">👤 {{ user.username }} (Admin)</span>
+          </li>
+          <li class="nav-item">
+            <form method="post" action="/logout/" style="display: inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-logout btn-sm">Sair</button>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container-fluid mt-5">
+    <div class="welcome-message">
+      <h1>Bem-vindo(a), {{ user.username }}! 👋</h1>
+      <p>Painel de Administração - Gerencie o sistema</p>
+    </div>
+
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-lg-3">
+        <div class="sidebar">
+          <h5 style="color: #28a745; font-weight: bold; margin-bottom: 20px;">
+            <i class="bi bi-list"></i> Menu Admin
+          </h5>
+          <a href="/admin/" class="sidebar-item">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+          <a href="/admin/" class="sidebar-item">
+            <i class="bi bi-people"></i> Usuários
+          </a>
+          <a href="/admin/" class="sidebar-item">
+            <i class="bi bi-box"></i> Produtos
+          </a>
+          <a href="/admin/" class="sidebar-item">
+            <i class="bi bi-certificate"></i> Certificações
+          </a>
+          <a href="/admin/" class="sidebar-item">
+            <i class="bi bi-graph-up"></i> Relatórios
+          </a>
+          <a href="/admin/" class="sidebar-item">
+            <i class="bi bi-gear"></i> Configurações
+          </a>
+        </div>
+      </div>
+
+      <!-- Main Area -->
+      <div class="col-lg-9">
+        <!-- Statistics Row -->
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="card card-custom">
+              <div class="stat-card">
+                <div class="number">12</div>
+                <div class="label">Usuários Ativos</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card card-custom">
+              <div class="stat-card">
+                <div class="number">45</div>
+                <div class="label">Produtos Cadastrados</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card card-custom">
+              <div class="stat-card">
+                <div class="number">8</div>
+                <div class="label">Certificações Pendentes</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card card-custom">
+              <div class="stat-card">
+                <div class="number">23</div>
+                <div class="label">Anúncios Publicados</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions Row -->
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card card-custom">
+              <div class="card-header">
+                <i class="bi bi-people"></i> Gerenciar Usuários
+              </div>
+              <div class="card-body">
+                <p class="card-text">Visualize, edite e aprove novos usuários do sistema.</p>
+                <a href="/admin/auth/user/" class="btn btn-success btn-sm">
+                  <i class="bi bi-person-check"></i> Ir para Admin
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="card card-custom">
+              <div class="card-header">
+                <i class="bi bi-certificate"></i> Processar Certificações
+              </div>
+              <div class="card-body">
+                <p class="card-text">Analise e aprove solicitações de certificação.</p>
+                <a href="/admin/core/certificacoes/" class="btn btn-success btn-sm">
+                  <i class="bi bi-file-check"></i> Ir para Admin
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="card card-custom">
+              <div class="card-header">
+                <i class="bi bi-box"></i> Produtos
+              </div>
+              <div class="card-body">
+                <p class="card-text">Gerencie os produtos cadastrados no sistema.</p>
+                <a href="/admin/core/produtos/" class="btn btn-success btn-sm">
+                  <i class="bi bi-list-check"></i> Ir para Admin
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="card card-custom">
+              <div class="card-header">
+                <i class="bi bi-graph-up"></i> Relatórios
+              </div>
+              <div class="card-body">
+                <p class="card-text">Visualize relatórios e estatísticas do sistema.</p>
+                <a href="#" class="btn btn-success btn-sm">
+                  <i class="bi bi-bar-chart"></i> Ver Relatórios
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

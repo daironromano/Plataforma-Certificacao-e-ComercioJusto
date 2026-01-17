@@ -15,3 +15,4 @@ Passo B: Configurar a Senha (settings.py)
 3. Alterar para o seu usuario e sua senha
 
 OBS: Não esquecer de instalar as bibliotecas. 
+

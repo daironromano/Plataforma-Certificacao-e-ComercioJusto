@@ -1,120 +1,132 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amazônia Marketing</title>
+{% extends "base.html" %}
 
-    <style>
-        /* corpo do site */
-        body {
-            font-family: sans-seif; margin: 0; background: #f9f9f9;
-        }
-        /* cabeçalho do site */
-        header {
-            background: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-        }
-       .logo {
-        color: #2e7d32;
-        font-size: 20px;
-        font-weight: bold;
-       }
-       .bnt-login {
-        background: #2e7d32;
-        color: white;
-        padding: 10px 20px;
-        text-decoration: none;
-        border-radius: 5px;
-       }
-       .banner {
-        background-color: #333;
+{% block title %}Amazônia Marketing{% endblock %}
+
+{% block content %}
+
+<style>
+    /* BANNER */
+    .banner {
+        background: linear-gradient(
+            rgba(28, 62, 29, 0.85),
+            rgba(28, 62, 29, 0.85)
+        );
         color: white;
         text-align: center;
-        padding: 60px 20px;
-        margin-bottom: 40px;
-       }
-       /* Grid de produtos */
-       .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-       }
-       .grid {
+        padding: 4rem 2rem;
+        border-radius: 8px;
+        margin-bottom: 3rem;
+    }
+
+    .banner h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .banner p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    /* GRID DE PRODUTOS */
+    .produtos-titulo {
+        margin-bottom: 1.5rem;
+        color: var(--verde-amazonia);
+    }
+
+    .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 20px;
-       }
-       /*Card do produto*/
-       .card {
+    }
+
+    .card {
         background: white;
         border: 1px solid #ddd;
         border-radius: 8px;
         overflow: hidden;
-       }
-       .card-img {
-        height: 200px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+    }
+
+    .card-img {
+        height: 180px;
         background: #eee;
         display: flex;
         align-items: center;
         justify-content: center;
-       }
-       .card-body {
-        padding: 15px;;
-       }
-       .preco {
-        color: #2e7d32;
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    .card-body h3 {
+        margin: 0 0 5px;
+        color: var(--verde-amazonia);
+    }
+
+    .categoria {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 8px;
+    }
+
+    .preco {
+        color: var(--verde-amazonia);
         font-weight: bold;
         font-size: 1.2rem;
-       }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="logo"> Amazônia Marketing </div>
-    <nav>
-        {% if usuario_logado %}
-            <span>Olá, <b>{{ usuario_logado }}</b></span>
-            {% if request.session.usuario_tipo == 'produtor' %}
-                <a href="{% url 'home_produtor' %}">Meus Produtos</a>
-            {% elif request.session.usuario_tipo == 'empresa' %}
-                <a href="{% url 'home_empresa' %}">Minhas Compras</a>
-            {% else %}
-                <a href="{% url 'home_admin' %}">Meu painel</a>
-            {% endif %}
-            <a class="bnt-login" href="{% url 'logout' %}">Sair</a>
-        {% else %}  
-            <a class="bnt-login" href="{% url 'login' %}">Login</a>
-        {% endif %}
-    </nav>
-</header>   
+        margin: 10px 0;
+    }
+
+    .produtor {
+        font-size: 0.8rem;
+        color: #777;
+    }
+</style>
 
 <div class="banner">
     <h1>Do campo para a mesa</h1>
     <p>Produtos certificados e sustentáveis da Amazônia</p>
+
+    {% if not request.session.usuario_id %}
+        <a href="{% url 'login' %}" class="btn btn-destaque" style="margin-top: 20px;">
+            Quero Comprar ou Vender
+        </a>
+    {% endif %}
 </div>
 
-<div class="container">
-    <h2>Produtos em Destaque</h2>
-    <div class="grid">
-        {% for p in nome %}
+<h2 class="produtos-titulo">Produtos em Destaque</h2>
+
+<div class="grid">
+    {% for p in nome %}
         <div class="card">
-            <div class="card-img">Foto</div>
+            <div class="card-img">
+                {% if p.imagem %}
+                    <img src="{{ p.imagem.url }}" alt="{{ p.nome }}" style="width:100%; height:100%; object-fit:cover;">
+                {% else %}
+                    Sem imagem
+                {% endif %}
+            </div>
+
             <div class="card-body">
                 <h3>{{ p.nome }}</h3>
-                <p>{{ p.categoria }}</p>
-                <p class="preco"> R$ {{ p.preco }}</p>
-                <small>Produtor: {{ p.usuario.nome }}</small>
+                <div class="categoria">{{ p.categoria }}</div>
+                <div class="preco">R$ {{ p.preco }}</div>
+                <div class="produtor">
+                    Produtor: {{ p.usuario.nome }}
+                </div>
             </div>
         </div>
-        {% empty %}
-        <p>Nenhum produto disponível no momento</p>
-        {% endfor %}
-    </div>
+    {% empty %}
+        <p>Nenhum produto disponível no momento.</p>
+    {% endfor %}
 </div>
-</body>
-</html>
+
+{% endblock %}

@@ -10,7 +10,7 @@ from django.db import models
 class Certificacoes(models.Model):
     id_certificacao = models.AutoField(primary_key=True)
     texto_autodeclaracao = models.TextField(blank=True, null=True)
-    documento = models.CharField(max_length=255)
+    documento = models.FileField(upload_to='certificacoes/', max_length=255)
     status_certificacao = models.CharField(max_length=9, blank=True, null=True)
     data_envio = models.DateField(blank=True, null=True)
     data_resposta = models.DateField(blank=True, null=True)
@@ -20,7 +20,6 @@ class Certificacoes(models.Model):
      # Diz para o django que essa tabela já existe e se chama 'Certificações'
      # Managed = False: desabilita o comportamento padrão do django: ele acha que é o dono do banco.
     class Meta:
-        managed = False
         db_table = 'Certificacoes'
 
 
@@ -32,7 +31,6 @@ class Marketplace(models.Model):
     produto = models.ForeignKey('Produtos', models.DO_NOTHING)
 
     class Meta:
-        managed = False
         db_table = 'Marketplace'
 
 class Produtos(models.Model):
@@ -43,9 +41,9 @@ class Produtos(models.Model):
     preco = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     status_estoque = models.CharField(max_length=10, blank=True, null=True)
     usuario = models.ForeignKey('Usuarios', models.DO_NOTHING)
+    imagem = models.ImageField(upload_to='produtos/', blank=True, null=True)
     
     class Meta:
-        managed = False
         db_table = 'Produtos'
     
 
@@ -63,5 +61,4 @@ class Usuarios(models.Model):
 
     # Diz para o django que essa tabela já existe e se chama 'Usuário'
     class Meta:
-        managed = False
         db_table = 'Usuarios'

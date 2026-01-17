@@ -13,6 +13,7 @@ urlpatterns = [
     path('auditoria/', views.home_admin, name='home_admin'), # Rota protegida: admin
     path('home/', views.home_padrao, name='home_padrao'),
     path('logout/', views.logout_view, name='logout'),
+    path('cadastro_produto/', views.cadastro_produto, name='cadastro_produto')
 ]
 
 if settings.DEBUG:

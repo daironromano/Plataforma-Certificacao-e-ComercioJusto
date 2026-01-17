@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 
 # Importamos a classe Usuarios que acabou de ser criada no models.py
 from .models import Usuarios, Produtos
+# Importamos a classe ProdutoForm que criamos no forms.py
+from .forms import ProdutoForm
 
 
 # --- Função para exibir tela inicial ---
@@ -48,7 +50,7 @@ def login_usuarios(request):
             msg = 'Usuário ou senha inválidos. Tente novamente'
     
     return render(request, 'login.html', {'msg': msg })
-           
+   
 # --- Função para fazer login no sistema ---
 def login_usuarios(request):
     msg = None
@@ -126,12 +128,43 @@ def logout_view(request):
     # Limpa a sessão (desloga)
     request.session.flush()
     return redirect('login')
-
+  
 # --- Função para cadastrar novo usuário ---
 
 # ---  Função para adicionar certificação ao produto ---
 
 # ---  Função para adicionar produtos ---
-
+@verificar_autenticacao
+def cadastro_produto(request):
+    # Adiciona nova camada de segurança para garantir que apenas usuários do tipo 'produtor' possam cadastrar produto
+    if request.session.get('usuario_tipo') != 'produtor':
+        return redirect('home_padrao') 
+    
+    # Testa qual é a ação que o usuário está fazendo, se é do tipo POST
+    if request.method == 'POST':
+        # Se sim, a variável 'form' irá receber os dados (POST) e arquivos (FILES)
+        form = ProdutoForm(request.POST, request.FILES)
+        # Garantindo consistência dos dados
+        if form.is_valid():
+            produto = form.save(commit=False) # Cria o objeto na memória, mas não salva no banco ainda.
+            
+            # Definindo o dono manualmente através da sessão
+            id_dono = request.session.get('usuario_id')
+            produto.usuario = Usuarios.objects.get(id_usuario=id_dono)
+            
+            # Definindo o status do produto para 'disponível'
+            produto.status_estoque = 'disponível'
+            
+            # Agora salvaremos no banco de dados as alterações e retornamos a home_produtor
+            form.save()
+            return rendirect('home_produtor')
+        
+        else:
+            # se for um GET apenas mostra o formulário para o usário
+            form = ProdutoForm()
+        
+        # Agora sim o formulário é enviado (renderizado) para o HTML
+        return render(request, 'cadastro_produto.html', {'form': form}) 
+        
 # ---  Função para empresa comprar produtos de produtor ---
 

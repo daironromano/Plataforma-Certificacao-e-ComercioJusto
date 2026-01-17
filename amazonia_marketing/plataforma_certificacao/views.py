@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-
 # Importamos a classe Usuarios que acabou de ser criada no models.py
 from .models import Usuarios, Produtos
 # Importamos a classe ProdutoForm que criamos no forms.py
@@ -153,18 +152,18 @@ def cadastro_produto(request):
             produto.usuario = Usuarios.objects.get(id_usuario=id_dono)
             
             # Definindo o status do produto para 'disponível'
-            produto.status_estoque = 'disponível'
+            produto.status_estoque = 'disponivel'
             
             # Agora salvaremos no banco de dados as alterações e retornamos a home_produtor
-            form.save()
-            return rendirect('home_produtor')
+            produto.save()
+            return redirect('home_produtor')
         
-        else:
+    else:
             # se for um GET apenas mostra o formulário para o usário
-            form = ProdutoForm()
+        form = ProdutoForm()
         
         # Agora sim o formulário é enviado (renderizado) para o HTML
-        return render(request, 'cadastro_produto.html', {'form': form}) 
+    return render(request, 'cadastro_produto.html', {'form': form}) 
         
 # ---  Função para empresa comprar produtos de produtor ---
 

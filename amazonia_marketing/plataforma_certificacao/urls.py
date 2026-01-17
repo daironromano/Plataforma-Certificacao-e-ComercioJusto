@@ -15,6 +15,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('cadastro_produto/', views.cadastro_produto, name='cadastro_produto'),
     path('produtor/certificado/', views.enviar_autodeclaracao, name='enviar_autodeclaracao' ),
+    path('produtor/deletar/<int:produto_id>', views.deletar_produto, name='deletar_produto')
 ]
 
 if settings.DEBUG:

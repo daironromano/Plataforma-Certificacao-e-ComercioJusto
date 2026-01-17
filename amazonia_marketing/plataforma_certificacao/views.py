@@ -5,6 +5,13 @@ from .models import Usuarios, Produtos, Certificacoes
 from .forms import ProdutoForm, ProdutoComAutodeclaracaoForm
 # Importamos datetime
 from datetime import datetime
+# Importar modulo de alerta sucesso ou erro
+from django.contrib import messages
+# Para conseguir calcular os dados
+from django.db.models import Count
+# ------
+from django.shortcuts import get_object_or_404
+
 
 
 # --- Função para exibir tela inicial ---
@@ -75,9 +82,29 @@ def home_produtor(request):
     # Filtra produtos que o dono é o usuário logado
     produtos = Produtos.objects.filter(usuario_id=usuario_id)
     
+    # CÁLCULO DE ALGUMAS MÉTRICAS PARA EXIBIR NO PERFIL DO PRODUTOR (FEEDBACK)
+    # -- Quantos produtos ele cadastrados -- 
+    total_produtos = produtos.count()
+    
+    # -- Quantas certificações ele tem pendente --
+    pendentes = Certificacoes.objects.filter(
+        produto__usuario_id = usuario_id,
+        status_certificacao = 'pendente',
+    ).count()
+    
+    # -- Quantas certificacoes ele tem aprovadas --
+    aprovados = Certificacoes.objects.filter(
+        produto__usuario_id = usuario_id,
+        status_certificacao = 'aprovado',
+    ).count()
+    
     # Lógica para entregar produtos cadastros para o frontend (HTML)
     contexto = {
-        'produtos': produtos
+        'produtos': produtos,
+        'total_produtos': total_produtos,
+        'pendentes': pendentes,
+        'aprovados': aprovados,
+        'usuario_nome': request.session.get('usuario_nome'),
     }
     
     # Renderiza a tela passando o nome do usuário para o HTML
@@ -116,8 +143,10 @@ def enviar_autodeclaracao(request):
                 # Admin responsável começa vazio (ninguém aprovou ainda)
                 admin_responsavel = None,
             )
+            
             nova_certificacao.save()
-            # Feedback e redicionamento (VAMOS IMPLEMENTAR FEEDBACK DEPOIS)
+            # Feedback e redicionamento 
+            messages.success(request, 'Documento enviado com sucesso! Aguardo a análise do auditor')            
             return redirect('home_produtor')
     else:
         # Considera que é um GET: exibe a tela inicial
@@ -131,6 +160,71 @@ def enviar_autodeclaracao(request):
     }
     
     return render(request, 'enviar_autodeclaracao.html', contexto)
+
+# ---  Função para o produtor adicionar produtos ---
+@verificar_autenticacao
+def cadastro_produto(request):
+    # Adiciona nova camada de segurança para garantir que apenas usuários do tipo 'produtor' possam cadastrar produto
+    if request.session.get('usuario_tipo') != 'produtor':
+        return redirect('home_padrao') 
+    
+    # Testa qual é a ação que o usuário está fazendo, se é do tipo POST
+    if request.method == 'POST':
+        # Se sim, a variável 'form' irá receber os dados (POST) e arquivos (FILES)
+        form = ProdutoForm(request.POST, request.FILES)
+        # Garantindo consistência dos dados
+        if form.is_valid():
+            produto = form.save(commit=False) # Cria o objeto na memória, mas não salva no banco ainda.
+            
+            # Definindo o dono manualmente através da sessão
+            id_dono = request.session.get('usuario_id')
+            produto.usuario = Usuarios.objects.get(id_usuario=id_dono)
+            
+            # Definindo o status do produto para 'disponível'
+            produto.status_estoque = 'disponivel'
+            
+            # Agora salvaremos no banco de dados as alterações e retornamos a home_produtor
+            produto.save()
+            
+            # Feedback para o usuário (UX)
+            messages.success(request, f'O produto {produto.nome} foi cadastrado')
+            
+            return redirect('home_produtor')
+        
+    else:
+            # se for um GET apenas mostra o formulário para o usário
+        form = ProdutoForm()
+        
+        # Agora sim o formulário é enviado (renderizado) para o HTML
+    return render(request, 'cadastro_produto.html', {'form': form}) 
+        
+@verificar_autenticacao
+# Função deleta em cascata 
+def deletar_produto(request, produto_id):
+    # Garantir que o produto existe para poder fazer algo com ele
+    produto = get_object_or_404(Produtos, id_produto=produto_id)
+    # Segurança para garantir que o usuário logado é o dono do produto cadastrado
+    id_logado = request.session.get('usuario_id')
+    if produto.usuario_id != id_logado:
+        messages.error(request, 'Tentativa de exclusão falha. Você não é o dono do produto!')
+        return redirect('home_prdutor')
+    # Antes de apagar, verifica se tem certificado e deleta também para não ter erro de integridade
+    certificacoes_vinculadas = Certificacoes.objects.filter(produto_id=produto_id)
+    if certificacoes_vinculadas.exists():
+        qtde = certificacoes_vinculadas.count()
+        certificacoes_vinculadas.delete()
+        print(f'Sistema: {qtde} certificações deletadas em cascata para o produto {produto_id}')
+    
+    # Excluindo o produto (se você for o dono dele)
+    nome_produto = produto.nome 
+    produto.delete()
+    # Feedback para o usuário
+    messages.success(request, f'Produto: {nome_produto} removido!')   
+    return redirect('home_produtor')
+    
+    
+
+
 
 
 
@@ -163,38 +257,5 @@ def logout_view(request):
 
 # ---  Função para adicionar certificação ao produto ---
 
-# ---  Função para adicionar produtos ---
-@verificar_autenticacao
-def cadastro_produto(request):
-    # Adiciona nova camada de segurança para garantir que apenas usuários do tipo 'produtor' possam cadastrar produto
-    if request.session.get('usuario_tipo') != 'produtor':
-        return redirect('home_padrao') 
-    
-    # Testa qual é a ação que o usuário está fazendo, se é do tipo POST
-    if request.method == 'POST':
-        # Se sim, a variável 'form' irá receber os dados (POST) e arquivos (FILES)
-        form = ProdutoForm(request.POST, request.FILES)
-        # Garantindo consistência dos dados
-        if form.is_valid():
-            produto = form.save(commit=False) # Cria o objeto na memória, mas não salva no banco ainda.
-            
-            # Definindo o dono manualmente através da sessão
-            id_dono = request.session.get('usuario_id')
-            produto.usuario = Usuarios.objects.get(id_usuario=id_dono)
-            
-            # Definindo o status do produto para 'disponível'
-            produto.status_estoque = 'disponivel'
-            
-            # Agora salvaremos no banco de dados as alterações e retornamos a home_produtor
-            produto.save()
-            return redirect('home_produtor')
-        
-    else:
-            # se for um GET apenas mostra o formulário para o usário
-        form = ProdutoForm()
-        
-        # Agora sim o formulário é enviado (renderizado) para o HTML
-    return render(request, 'cadastro_produto.html', {'form': form}) 
-        
 # ---  Função para empresa comprar produtos de produtor ---
 

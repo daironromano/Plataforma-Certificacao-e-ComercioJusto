@@ -28,10 +28,10 @@ CREATE TABLE Produtos (
     descricao TEXT,
     preco DECIMAL(10, 2), 
     status_estoque ENUM('disponivel', 'esgotado') DEFAULT 'disponivel',
-    imagem VARCHAR(255) NULL,
     -- Quem cadastrou o produtor
     usuario_id INT NOT NULL,
     FOREIGN KEY (usuario_id) REFERENCES Usuarios(id_usuario)
+    imagem VARCHAR(255) NULL,
 );
 
 -- 3. Tabela Certificações

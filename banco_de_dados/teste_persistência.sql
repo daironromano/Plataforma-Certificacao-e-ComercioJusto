@@ -18,7 +18,7 @@ INSERT INTO Usuarios (nome, email, telefone, endereco, senha, tipo, matricula)
 VALUES ('Carlos Auditor', 'admin@amazonia.com', '91777777777', 'Escritório Central', 'admin123', 'admin', 'ADM2025');
 
 -- 2. Inserindo Produtos (Associados ao Produtor Maria - ID 1)
-INSERT INTO Produtos (nome, categoria, descricao, preco, status_estoque, usuario_id) 
+INSERT INTO Produtos (nome, categoria, descricao, preco, status_estoque, usuario_id, imagem) 
 VALUES 
 ('Mel de Abelha Nativa', 'Alimentos', 'Mel puro produzido na região do Baixo Amazonas.', 45.00, 'disponivel', 1),
 ('Cesto de Palha', 'Artesanato', 'Cesto trançado manualmente com fibra natural.', 30.00, 'disponivel', 1);

@@ -31,6 +31,7 @@ CREATE TABLE Produtos (
     -- Quem cadastrou o produtor
     usuario_id INT NOT NULL,
     FOREIGN KEY (usuario_id) REFERENCES Usuarios(id_usuario)
+    imagem VARCHAR(255) NULL,
 );
 
 -- 3. Tabela Certificações

@@ -49,6 +49,8 @@ db.sqlite3
 db.sqlite3-journal
 /media/
 /staticfiles/
+
+# Logs
 *.log
 
 # Testing
@@ -68,3 +70,12 @@ Thumbs.db
 node_modules/
 npm-debug.log
 yarn-error.log
+
+# Virtualenv
+venv/
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/

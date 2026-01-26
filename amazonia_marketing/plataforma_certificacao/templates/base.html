@@ -17,6 +17,7 @@
         
         /* CABEÇALHO PADRÃO PARA TODAS AS PÁGINAS HTML (DRY - Fica aqui e aparece em todas as telas) */
         header { background-color: var(--verde-amazonia); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
         .logo { 
             font-size: 1.5rem; 
             font-weight: bold; 
@@ -46,6 +47,11 @@
             color: #DABB2C;
             font-weight: bold;
         }
+
+        .logo { font-size: 1rem; font-weight: bold; color: var(--fundol); text-decoration: none;}
+        .inicial{height: 90x; width: 90px;}
+        .branca{height: 200x; width: 130px; }
+
         .nav-links a { color: var(--verde-amazonia); text-decoration: none; margin-left: 15px; font-weight: bold; transition: 0.3s; background-color: var(--amarelo-sol); padding: 6px 12px; border-radius: 2px;}
         .nav-links a:hover { color: var(--verde-amazonia); background-color: var(--fundo); }
 
@@ -59,11 +65,15 @@
         .btn-destaque { background-color: var(--amarelo-sol); color: var(--verde-amazonia); }
         .btn-danger { background-color: #d9534f; color: white; }
         .form-input { width: 100%; padding: 10px; margin: 5px 0 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        
+        footer { background-color: #333; color: white; text-align: center; padding: 1rem; margin-top: auto; }
+
     </style>
 </head>
 <body>
-
+ {% load static %}
     <header>
+
         <a href="{% url 'home_publica' %}" class="logo">
             <img src="/media/logotipo.png" alt="Logo Amazônia Marketing" style="height: 60px; width: auto;">
             <div class="logo-text">
@@ -71,6 +81,10 @@
                 <span class="logo-sub">Comércio Justo & Sustentável</span>
             </div>
         </a>
+
+        <a href="{% url 'home_publica' %}" class="logo"> <img src="{% static 'imagem-branca.png' %}" class="branca"> </a>
+        
+
         <nav class="nav-links">
             {% if request.session.usuario_id %}
                 <span>Olá, {{ request.session.usuario_nome }}</span>

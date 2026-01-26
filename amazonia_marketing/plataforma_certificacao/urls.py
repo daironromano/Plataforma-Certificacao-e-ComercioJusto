@@ -10,6 +10,7 @@ urlpatterns = [
     path('registration/login/', views.login_usuarios, name='login'), # Rota para usuários cadastrados
     path('registration/cadastro/', views.cadastro_usuario, name='cadastro'), # Rota para cadastrar usuários    
     path('produtor/dashboard/', views.home_produtor, name='home_produtor'), # Rota protegida: produtor
+    path('produtor/perfil/editar/', views.editar_perfil_produtor, name='editar_perfil_produtor'),
     path('empresa/dashboard/', views.home_empresa, name='home_empresa'), # Rota protegida: empresa
     path('auditoria/dashboard', views.home_admin, name='home_admin'), # Rota protegida: admin
     path('home/', views.home_publica, name='home_publica'),

@@ -9,9 +9,9 @@ from django.contrib.auth.decorators import login_required
 # Sistema de mensagens (Aquelas faixas verdes/vermelhas de feedback)
 from django.contrib import messages
 # Nossos modelos (As tabelas do Banco de Dados)
-from .models import CustomUser, Produtos, Certificacoes
+from .models import CustomUser, Produtos, Certificacoes, PerfilProduto, PerfilEmpresa
 # Nossos formulários (A validação dos dados que entram)
-from .forms import ProdutoForm, ProdutoComAutodeclaracaoForm, CadastroUsuarioForm
+from .forms import ProdutoForm, ProdutoComAutodeclaracaoForm, CadastroUsuarioForm, EditarPerfilProdutorForm
 # Utilitários (ferramentas úteis para data e contagem)
 from datetime import datetime
 from django.db.models import Count
@@ -183,6 +183,39 @@ def cadastro_produto(request):
     return render(request, 'cadastro_produto.html', {'form': form}) 
 
 @login_required
+def editar_perfil_produtor(request):
+    if request.user.tipo_usuario != 'produtor':
+        return redirect('home_publica')
+    
+    # Tenta pegar o perfil. Se não existir, cria um vazio na memória (evita crash)
+    perfil, created = PerfilProduto.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        form = EditarPerfilProdutorForm(request.POST, request.FILES, instance=perfil)
+        
+        if form.is_valid():
+            # 1. Salva os dados do Perfil (Bio, Nome, etc)
+            form.save()
+            
+            # 2. Salva os dados do Usuário (Nome, Email) manualmente
+            request.user.first_name = form.cleaned_data['first_name']
+            request.user.email = form.cleaned_data['email']
+            request.user.save()
+            
+            messages.success(request, 'Perfil atualizado com sucesso!')
+            return redirect('home_produtor')
+    else:
+        # Carrega o formulário com os dados atuais do banco (Preenchimento automático)
+        initial_data = {
+            'first_name': request.user.first_name,
+            'email': request.user.email
+        }
+        form = EditarPerfilProdutorForm(instance=perfil, initial=initial_data)
+
+    return render(request, 'editar_perfil_produtor.html', {'form': form})
+    
+    
+@login_required
 def enviar_autodeclaracao(request):
     # Garantir é sempre bom =)
     if request.user.tipo_usuario != 'produtor':
@@ -204,7 +237,7 @@ def enviar_autodeclaracao(request):
             nova_certificacao = Certificacoes(
                 produto=produto_selecionado,
                 texto_autodeclaracao=texto,
-                documento=arquivo,
+                arquivo_autodeclaracao=arquivo,
                 status_certificacao='pendente', # Nasce pendente
                 admin_responsavel=None, # Ninguém auditou ainda
             )

@@ -35,7 +35,6 @@ def validar_arquivo_seguro(arquivo):
     
     return arquivo
 
-
 # --- FORMULÁRIO 1: CADASTRO DE PRODUTO ---
 class ProdutoForm(forms.ModelForm):
     class Meta:
@@ -54,7 +53,29 @@ class ProdutoForm(forms.ModelForm):
         imagem = self.cleaned_data.get('imagem')
         return validar_arquivo_seguro(imagem)
 
-
+class EditarPerfilProdutorForm(forms.ModelForm):
+    # Campos que queremos editar
+    first_name = forms.CharField(label='Nome da Pessoa Física', widget=forms.TextInput(attrs={'class': 'form-input'}))
+    email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'form-input'}))
+    
+    # Campos do perfil
+    class Meta:
+        model = PerfilProduto
+        fields = ['nome', 'telefon', 'endereco', 'bio']
+        
+        labels = {
+            'nome': 'Nome da Fazenda / Negócio',
+            'endereco': 'Endereço da Propriedade',
+            'telefon': 'Telefone'
+        }
+        
+        widgets = {
+            'nome': forms.TextInput(attrs={'class': 'form-input'}),
+            'telefon': forms.TextInput(attrs={'class': 'form-input', 'placeholder': '(XX) XXXXX-XXXX'}),
+            'endereco': forms.Textarea(attrs={'class': 'form-input', 'rows': 3}),
+            'bio': forms.Textarea(attrs={'class': 'form-input', 'rows': 4, 'placeholder': 'Fale sobre o que torna seus produtos diferentes.'}),
+        }
+        
 # --- FORMULÁRIO 2: CERTIFICAÇÃO (Entrega da Sprint 4) ---
 class ProdutoComAutodeclaracaoForm(forms.Form): # Formulário híbrido, por isso não herda ModelForm
     # Campo 1: Select (Menu) para escolher qual produto certificar
@@ -100,7 +121,6 @@ class ProdutoComAutodeclaracaoForm(forms.Form): # Formulário híbrido, por isso
             raise ValidationError('Por favor, preencha o texto OU envie um arquivo.')
 
         return cleaned_data
-    
     
 # FORMULÁRIO DE CADASTRO DO USUÁRIO
 class CadastroUsuarioForm(UserCreationForm):
@@ -175,3 +195,5 @@ class CadastroUsuarioForm(UserCreationForm):
                     cnpj=cnpj_limpo
                 )
         return user
+    
+  

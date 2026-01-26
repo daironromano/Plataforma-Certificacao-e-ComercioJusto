@@ -42,7 +42,7 @@ class PerfilProduto(models.Model):
     # Relacionamento 1 para 1, ou seja, cada usuário tem apenas um perfil de produtor.
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='produtor_perfil')
     
-    cpf = models.CharField(max_length=14, unique=True)
+    cpf = models.CharField(max_length=11, unique=True)
     nome = models.CharField(max_length=100)
     endereco = models.TextField()
     telefon = models.CharField(max_length=10)
@@ -55,7 +55,7 @@ class PerfilEmpresa(models.Model):
     # Relacionamento 1 para 1, ou seja, cada usuário tem apenas um perfil de empresa.
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='empresa_perfil')
     
-    cnpj = models.CharField(max_length=18, unique=True)
+    cnpj = models.CharField(max_length=14, unique=True)
     razao_social = models.CharField(max_length=100)
     
     # Arquivo para comprovar que é uma empresa legalizada

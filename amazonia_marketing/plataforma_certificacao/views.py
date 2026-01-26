@@ -1,331 +1,338 @@
-# ------
+# IMPORTAÇÕES ====================================================================
+# render: monta o HTML final
+# redirect: manda o usuário para outra URL.
+# get_object_or_404: tenta buscar no banco; se não achar, mostra erro 404 (não encontrado) em vez de travar o site.
 from django.shortcuts import render, redirect, get_object_or_404
-# Importanto ferramentas de segurança nativa do django
+# Ferramentas de segurança nativas do Django 
 from django.contrib.auth import authenticate, login, logout
-# Verifica a autenticação do login
 from django.contrib.auth.decorators import login_required
-# Importar modulo de alerta sucesso ou erro
+# Sistema de mensagens (Aquelas faixas verdes/vermelhas de feedback)
 from django.contrib import messages
-# Importar novos modelos do banco 
-from .models import CustomUser, Produtos,Certificacoes
-# Importamos a classe ProdutoForm que criamos no forms.py
-from .forms import ProdutoForm, ProdutoComAutodeclaracaoForm
-# Importamos datetime
+# Nossos modelos (As tabelas do Banco de Dados)
+from .models import CustomUser, Produtos, Certificacoes
+# Nossos formulários (A validação dos dados que entram)
+from .forms import ProdutoForm, ProdutoComAutodeclaracaoForm, CadastroUsuarioForm
+# Utilitários (ferramentas úteis para data e contagem)
 from datetime import datetime
-# Para conseguir calcular os dados
 from django.db.models import Count
 
+# ==============================================================================
+# 1. ÁREA PÚBLICA E AUTENTICAÇÃO
+# ==============================================================================
 
-
-
-# --- Função para exibir tela inicial ---
 def home_publica(request):
-    # Filtra apenas produtos disponíveis e armazena na variável
+    """
+    View da página inicial (Vitrine).
+    Acessível para qualquer pessoa (logada ou não)
+    """
+    # Filtra apenas produtos disponíveis no estoque
     produtos = Produtos.objects.filter(status_estoque='disponivel')
     
-    # Filtrando apenas os produtos com selo aprovado
+    # Filtrando apenas os produtos com selo aprovado pelo ID
     ids_com_selo = Certificacoes.objects.filter(status_certificacao='aprovado').values_list('produto_id', flat=True)
-    # Marcando os produtos antes de enviar para o front (com/sem selo)
+    
+    # Marcando os produtos que tem selo antes de enviar para o front
     for p in produtos:
         if p.id_produto in ids_com_selo:
-            p.tem_selo = True
+            p.tem_selo = True # Criamos esse atributo na memória (não vai pro banco)
         else:
             p.tem_selo = False
-        
+            
+    # Entregamos a lista processada para o template desenhar.
     return render(request, 'index.html', {'produtos': produtos})
 
-# Lógica para redicionar o usuário de acordo com o seu tipo 
 def redirecionar_por_tipo(user):
+    """
+    Função auxiliar que decide para onde o usuário vai.
+    Centraliza a inteligência de 'Para onde cada um vai?'.
+    Evita ter que repetir esses IFs no login e no cadastro.
+    """
     if user.tipo_usuario == 'produtor':
         return redirect('home_produtor')
     elif user.tipo_usuario == 'empresa':
-        return redirect('home_empresa') # Falta criar
+        return redirect('home_empresa')
     elif user.tipo_usuario == 'auditor':
         return redirect('home_admin')
     elif user.is_superuser:
         return redirect('/admin/')
     else:
-        return redirect('home_padrao')
+        return redirect('home_publica')
 
-# --- Função para fazer login no sistema (Atualizada com ferramentas nativas do django) ---
 def login_usuarios(request):
+    """
+    View de Login Seguro.
+    Substitui a lógica manual antiga por 'authenticate()'.
+    """
+    
+    # Se o cara já está logado, não deixa ele ver a tela de login. Joga pro painel.
     if request.user.is_authenticated:
         return redirecionar_por_tipo(request.user)
     
-    # Pegamos os dados do html 
+    # Se ele preencheu o formulário e clicou "Entrar"...
     if request.method == 'POST':
-        email_form = request.POST.get('email')
-        senha_form = request.POST.get('senha')
-        # authenticate: Verifica se user e senha batem de forma segura.
+        # Django Auth espera 'username' e 'password'. #Pegamos os dados pelos 'names' dos inputs no HTML.
+        email_form = request.POST.get('username')
+        senha_form = request.POST.get('password')
+        
+        # Verifica as credenciais: a função authenticate transforma a senha em hash e compara com o hash salvo no banco.
         user = authenticate(request, username=email_form, password=senha_form)
         
-        # Cria a sessão no navegador (o cookie seguro)
+        # Se deu certo, cria a Sessão
         if user is not None:
             login(request, user)
-            # Essa função decide para onde o usuário vai pelo seu tipo
             return redirecionar_por_tipo(user)
         else: 
+            # Feedback visual de erro
             messages.error(request, 'Usuário ou senha inválidos.')
             
     return render(request, 'registration/login.html')
 
-# --- Função de Segurança (Decorador) ---
-# Se alguém tentar acessar direto pela URL sem logar, essa função chuta de volta.
-def verificar_autenticacao(view_func):
-    def wrapper(request, *args, **kwargs):
-        if 'usuario_id' not in request.session:
-            return redirect('login') # Chuta para o login
-        return view_func(request, *args, **kwargs)
-    return wrapper
+def cadastro_usuario(request):
+    # Se o cara já está logado, chuta ele pro painel (não faz sentido cadastrar de novo)
+    if request.user.is_authenticated:
+        return redirecionar_por_tipo(request.user)
+    
+    if request.method == 'POST':
+        form = CadastroUsuarioForm(request.POST)
+        if form.is_valid():
+            # O método save() que criamos no forms.py faz toda a mágica do banco
+            user = form.save()
+            # Já logamos o usuário automaticamente após o cadastro 
+            login(request, user)
+            
+            messages.success(request, f'Bem-vindo, {user.first_name}! Cadastro realizado.')
+            return redirecionar_por_tipo(user)
+        else:
+            messages.error(request, 'Erro no cadastro. Verifique os campos.')
+    else:
+        form = CadastroUsuarioForm()
+        
+    return render(request, 'registration/cadastro.html', {'form': form})
 
-# --- As Telas Protegidas ---
+def logout_view(request):
+    """
+    Encerra a sessão de forma segura.
+    Limpa os cookies de autenticação do navegador.
+    """
+    logout(request)
+    return redirect('home_publica')
 
-# --- DASHBOARD DO PRODUTOR ---
-@verificar_autenticacao
+# ==============================================================================
+# 2. ÁREA DO PRODUTOR
+# ==============================================================================
+
+@login_required # Decorador barra que não está logado
 def home_produtor(request):
-    # Segurança extra: Garante que só PRODUTOR entra aqui
-    if request.session.get('usuario_tipo') != 'produtor':
-         return redirect('login')
+    # Segurança extra: mesmo logado, verificamos: "Você é realmente um produtor?"
+    if request.user.tipo_usuario != 'produtor':
+        messages.error(request, 'Área restrita somente para produtores.')
+        return redirect('home_publica')
     
-    # Identifica quem é o produtor logado
-    usuario_id = request.session.get('usuario_id')
-    # Filtra produtos que o dono é o usuário logado
-    produtos = Produtos.objects.filter(usuario_id=usuario_id)
+    # Filtra produtos que o dono é o usuário logado (request.user)
+    produtos = Produtos.objects.filter(usuario=request.user)
     
-    # CÁLCULO DE ALGUMAS MÉTRICAS PARA EXIBIR NO PERFIL DO PRODUTOR (FEEDBACK)
-    # -- Quantos produtos ele cadastrados -- 
+    # Métricas para o Dashboard:
     total_produtos = produtos.count()
-    
-    # -- Quantas certificações ele tem pendente --
-    pendentes = Certificacoes.objects.filter(
-        produto__usuario_id = usuario_id,
-        status_certificacao = 'pendente',
-    ).count()
-    
-    # -- Quantas certificacoes ele tem aprovadas --
-    aprovados = Certificacoes.objects.filter(
-        produto__usuario_id = usuario_id,
-        status_certificacao = 'aprovado',
-    ).count()
-       
-    # Lógica para entregar produtos cadastros para o frontend (HTML)
+    # Filtro Relacional (__): "Busque certificações onde o produto do usuário é X"
+    pendentes = Certificacoes.objects.filter(produto__usuario=request.user, status_certificacao='pendente').count()
+    aprovados = Certificacoes.objects.filter(produto__usuario=request.user, status_certificacao='aprovado').count()
+        
+    # RECUPERAÇÃO DE DADOS EXTRAS DO PERFIL: Tentamos acessar a tabela 'ProdutorPerfil' vinculada.
+    try:
+        # ATENÇÃO: Certifique-se que no models.py o related_name é 'produtor_perfil'
+        # 'produtor_perfil' é o related_name que definimos no models.py
+        perfil = request.user.produtor_perfil
+        nome_exibicao = perfil.nome  # Pegamos o nome da fazenda/produtor
+    except:
+        # Fallback caso o perfil não tenha sido criado ou o nome esteja diferente
+        nome_exibicao = request.user.first_name or request.user.username
+        
     contexto = {
         'produtos': produtos,
         'total_produtos': total_produtos,
         'pendentes': pendentes,
         'aprovados': aprovados,
-        'usuario_nome': request.session.get('usuario_nome'),
+        'usuario_nome': nome_exibicao,
     }
     
-    # Renderiza a tela passando o nome do usuário para o HTML
     return render(request, 'home_produtor.html', contexto)
 
-# --- ENVIO DE DOCUMENTO PELO PRODUTOR (AUTODECLARAÇÃO) ---
-@verificar_autenticacao
+@login_required
+def cadastro_produto(request):
+    # Verificação de segurança de novo, o cara tem que ser quem diz ser para poder bagunçar as coisas aqui. Não é assim não, fi!
+    if request.user.tipo_usuario != 'produtor':
+        return redirect('home_publica') 
+    
+    if request.method == 'POST':
+        # Carregamos o form com os dados (POST) e arquivos de imagem (FILES)
+        form = ProdutoForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Cria o objeto na memória RAM, mas não manda pro banco ainda.
+            produto = form.save(commit=False)
+            # Vincula ao usuário logado (request.user)
+            produto.usuario = request.user
+            produto.status_estoque = 'disponivel'
+            # Agora que sabemos quem é o usuário, podemos salvar no banco.
+            produto.save()
+            messages.success(request, f'O produto {produto.nome} foi cadastrado')
+            return redirect('home_produtor')
+    else:
+        # Se for GET (abrir a página), entregamos um form vazio para o cara preencher.
+        form = ProdutoForm()
+        
+    return render(request, 'cadastro_produto.html', {'form': form}) 
+
+@login_required
 def enviar_autodeclaracao(request):
-    # Segurança de perfil, garante que só o produtor faça o envio
-    if request.session.get('usuario_tipo') != 'produtor':
-        return redirect('home_padrao')
-    # Identificando o usuário logado
-    usuario_id = request.session.get('usuario_id')
-    # Processando o formulário (POST)
+    # Garantir é sempre bom =)
+    if request.user.tipo_usuario != 'produtor':
+        return redirect('home_publica')
+    
+    # Processando o formulário
     if request.method == 'POST':
         form = ProdutoComAutodeclaracaoForm(request.POST, request.FILES)
-        form.fields['produto'].queryset = Produtos.objects.filter(usuario_id=usuario_id)
+        # Filtra o dropdown para mostrar só produtos do usuário logado
+        form.fields['produto'].queryset = Produtos.objects.filter(usuario=request.user)
         
         if form.is_valid():
-            # Extrair os dados do formulário
+            # Extraímos os dados limpos
             produto_selecionado = form.cleaned_data['produto']
             texto = form.cleaned_data['texto_autodeclaracao']
             arquivo = form.cleaned_data['arquivo_autodeclaracao']
             
-            # 5. Regra de Negócio: Criação da Certificação
+            # Criamos manualmente o registro na tabela de Certificações
             nova_certificacao = Certificacoes(
-                # Extraindo os dados do formulário
-                produto = produto_selecionado,
-                texto_autodeclaracao = texto,
-                # Se tiver arquivo, salva o arquivo. Se não, salva None.
-                documento = arquivo,
-                # Implementado a lógica de negócio: status nasce como pendente até um admin aprovar
-                status_certificacao = 'pendente',
-                data_envio = datetime.now().date(),
-                
-                # Admin responsável começa vazio (ninguém aprovou ainda)
-                admin_responsavel = None,
+                produto=produto_selecionado,
+                texto_autodeclaracao=texto,
+                documento=arquivo,
+                status_certificacao='pendente', # Nasce pendente
+                admin_responsavel=None, # Ninguém auditou ainda
             )
             
             nova_certificacao.save()
-            # Feedback e redicionamento 
             messages.success(request, 'Documento enviado com sucesso! Aguardo a análise do auditor')            
             return redirect('home_produtor')
     else:
-        # Considera que é um GET: exibe a tela inicial
         form = ProdutoComAutodeclaracaoForm()
-        # Aqui mostramos apenas os produtos que o usuario logado é dono
-        form.fields['produto'].queryset = Produtos.objects.filter(usuario_id=usuario_id)
+        # Filtra produtos no GET também
+        form.fields['produto'].queryset = Produtos.objects.filter(usuario=request.user)
         
     contexto = {
         'form': form,
-        'usuario_nome': request.session.get('usuario_nome')
+        'usuario_nome': request.user.first_name or request.user.username
     }
     
     return render(request, 'enviar_autodeclaracao.html', contexto)
 
-# ---  Função para o produtor adicionar produtos ---
-@verificar_autenticacao
-def cadastro_produto(request):
-    # Adiciona nova camada de segurança para garantir que apenas usuários do tipo 'produtor' possam cadastrar produto
-    if request.session.get('usuario_tipo') != 'produtor':
-        return redirect('home_padrao') 
-    
-    # Testa qual é a ação que o usuário está fazendo, se é do tipo POST
-    if request.method == 'POST':
-        # Se sim, a variável 'form' irá receber os dados (POST) e arquivos (FILES)
-        form = ProdutoForm(request.POST, request.FILES)
-        # Garantindo consistência dos dados
-        if form.is_valid():
-            produto = form.save(commit=False) # Cria o objeto na memória, mas não salva no banco ainda.
-            
-            # Definindo o dono manualmente através da sessão
-            id_dono = request.session.get('usuario_id')
-            produto.usuario = Usuarios.objects.get(id_usuario=id_dono)
-            
-            # Definindo o status do produto para 'disponível'
-            produto.status_estoque = 'disponivel'
-            
-            # Agora salvaremos no banco de dados as alterações e retornamos a home_produtor
-            produto.save()
-            
-            # Feedback para o usuário (UX)
-            messages.success(request, f'O produto {produto.nome} foi cadastrado')
-            
-            return redirect('home_produtor')
-        
-    else:
-            # se for um GET apenas mostra o formulário para o usário
-        form = ProdutoForm()
-        
-        # Agora sim o formulário é enviado (renderizado) para o HTML
-    return render(request, 'cadastro_produto.html', {'form': form}) 
-        
-@verificar_autenticacao
-# Função deleta em cascata 
+@login_required
 def deletar_produto(request, produto_id):
-    # Garantir que o produto existe para poder fazer algo com ele
+    # Busca o produto ou erro 404 se não existir
     produto = get_object_or_404(Produtos, id_produto=produto_id)
-    # Segurança para garantir que o usuário logado é o dono do produto cadastrado
-    id_logado = request.session.get('usuario_id')
-    if produto.usuario_id != id_logado:
+    
+    # Verificamos se o dono do produto no banco é IGUAL a quem está tentando apagar.
+    if produto.usuario != request.user:
         messages.error(request, 'Tentativa de exclusão falha. Você não é o dono do produto!')
-        return redirect('home_prdutor')
-    # Antes de apagar, verifica se tem certificado e deleta também para não ter erro de integridade
+        return redirect('home_produtor') 
+
+    # INTEGRIDADE REFERENCIAL (Cascata Manual):
+    # Antes de apagar o Pai (Produto), verificamos se tem Filhos (Certificações).
     certificacoes_vinculadas = Certificacoes.objects.filter(produto_id=produto_id)
     if certificacoes_vinculadas.exists():
         qtde = certificacoes_vinculadas.count()
         certificacoes_vinculadas.delete()
-        print(f'Sistema: {qtde} certificações deletadas em cascata para o produto {produto_id}')
+        print(f'Sistema: {qtde} certificações deletadas em cascata')
     
-    # Excluindo o produto (se você for o dono dele)
+    # Agora é seguro apagar o pai
     nome_produto = produto.nome 
     produto.delete()
-    # Feedback para o usuário
     messages.success(request, f'Produto: {nome_produto} removido!')   
     return redirect('home_produtor')
-    
-@verificar_autenticacao
+
+# ==============================================================================
+# 3. ÁREA DA EMPRESA
+# ==============================================================================
+
+@login_required
 def home_empresa(request):
-    # Segurança extra: Garante que só EMPRESA entra aqui
-    if request.session.get('usuario_tipo') != 'empresa':
+    # Bloqueia quem não é empresa
+    if request.user.tipo_usuario != 'empresa':
          return redirect('login')
-        # Renderiza a tela passando o nome do usuário para o HTML
+    # Renderiza o dashboard da empresa 
     return render(request, 'home_empresa.html')
 
-# -- DASHBOARD DO ADMINISTRADOR ---
-@verificar_autenticacao
+# ==============================================================================
+# 4. ÁREA DO AUDITOR (ADMIN)
+# ==============================================================================
+
+@login_required
 def home_admin(request):
-    # Segurança extra: Garante que só ADMIN entra aqui
-    if request.session.get('usuario_tipo') != 'admin':
-        messages.error(request, 'Acesso restrito a administradores!')
-        return redirect('login')
+    # Permite apenas 'auditor' 
+    if request.user.tipo_usuario != 'auditor' and not request.user.is_superuser:
+        messages.error(request, 'Acesso restrito a desenvolvedores!')
+        return redirect('home_publica')
     
-    # Métricas para exibir no dashboard 
-    # Contamos quantos pedidos existem em cada fila 
+    # O auditor vê os dados de TODOS os produtores, por isso não filtramos por usuário aqui.
     pendente = Certificacoes.objects.filter(status_certificacao='pendente').count()
     aprovado = Certificacoes.objects.filter(status_certificacao='aprovado').count()
     reprovado = Certificacoes.objects.filter(status_certificacao='reprovado').count()
     
-    # Prepara os dados para serem enviados para o HTML
     contexto = {
         'pendente': pendente,
         'aprovado': aprovado,
         'reprovado': reprovado,
-        'usuario_nome': request.session.get('usuario_nome'),
+        'usuario_nome': request.user.username,
     }
     return render(request, 'home_admin.html', contexto)
 
-# Função para visualização dos certificados pelo administrador
-@verificar_autenticacao
+@login_required
 def admin_visualizar_certificados(request):
-    # Segurança para garantir que apenas usuário do tipo admin visualizem os certificados
-    if request.session.get('usuario_tipo') != 'admin':
+    # Verificação de Permissão
+    if request.user.tipo_usuario != 'auditor' and not request.user.is_superuser:
         return redirect('login')
-    # Filtro para saber as auditorias pendentes 
+    # Filtro via URL (ex: ?status=pendente)
     status_filtro = request.GET.get('status')
-    # Consultando produtos e usuários juntos com 'select_related'
+    # O Django faz um JOIN no SQL para trazer os dados do Produto e do Produtor na mesma consulta.
     consulta = Certificacoes.objects.select_related('produto', 'produto__usuario').all().order_by('-data_envio')
+    
     if status_filtro: 
         consulta = consulta.filter(status_certificacao=status_filtro)
 
     contexto = {
         'certificacoes': consulta,
         'status_filtro': status_filtro,
-        'usuario_nome': request.session.get('usuario_nome'),
+        'usuario_nome': request.user.username,
     }
     
     return render(request, 'admin_certificacoes.html', contexto)
 
-# Função que o botão aprovar irá chamar
-@verificar_autenticacao
+@login_required
 def admin_responder_certificacoes(request, certificacao_id):
-    # Segurança: garantindo que somente admin possa ter essa ação
-    if request.session.get('usuario_tipo') != 'admin':
+    # Segurança mais um vez.
+    if request.user.tipo_usuario != 'auditor' and not request.user.is_superuser:
         return redirect('login')
     
     certificacao = get_object_or_404(Certificacoes, id_certificacao=certificacao_id)
     
     if request.method == 'POST':
-        acao = request.POST.get('acao') # Pega o valor dobotão 
-        admin_id = request.session.get('usuario_id')
+        acao = request.POST.get('acao') # Captura qual botão foi clicado (Aprovar/Rejeitar)
+        # Salva o usuário logado como responsável
+        # Em vez de salvar só o ID, salvamos o OBJETO do usuário logado.
+        admin_responsavel = request.user
         
         if acao == 'aprovar':
             certificacao.status_certificacao = 'aprovado'
             messages.success(request, f'Certificação APROVADA para o produto {certificacao.produto.nome}!')
         elif acao == 'rejeitar':
+            # Usando 'reprovado' conforme seu código anterior
             certificacao.status_certificacao = 'reprovado'
             messages.warning(request, f'Certificação REJEITADA para o produto {certificacao.produto.nome}.')
         
-        # Auditoria: Registra quem fez e quando
+        # Registrando o rastro da auditoria (Quem e Quando)
         certificacao.data_resposta = datetime.now().date()
-        certificacao.admin_responsavel_id = admin_id
-        certificacao.save() # Atualiza no Banco
+        certificacao.admin_responsavel = admin_responsavel
+        # Persistindo no Banco de Dados
+        certificacao.save()
         
-        return redirect('admin_visualizar_certificacoes')
+        return redirect('admin_visualizar_certificados') 
     
     return redirect('home_admin')
-
-@verificar_autenticacao
-def home_padrao(request):
-    return render(request, 'home.html')
-
-# --- Função para deslogar o usuário ---
-def logout_view(request):
-    # Limpa a sessão (desloga)
-    request.session.flush()
-    return redirect('login')
-  
-# --- Função para cadastrar novo usuário ---
-
-# ---  Função para adicionar certificação ao produto ---
-
-# ---  Função para empresa comprar produtos de produtor ---
-

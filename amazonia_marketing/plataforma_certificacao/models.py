@@ -46,7 +46,7 @@ class PerfilProduto(models.Model):
     nome = models.CharField(max_length=100)
     endereco = models.TextField()
     telefon = models.CharField(max_length=10)
-    bio = models.TextField(blank=True, help_text='Breve descrição sobre o produtor')
+    bio = models.TextField(blank=True)
     
     def __str__(self):
         return f'Perfil produtor: {self.user.username}'

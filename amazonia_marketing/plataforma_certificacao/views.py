@@ -9,9 +9,9 @@ from django.contrib.auth.decorators import login_required
 # Sistema de mensagens (Aquelas faixas verdes/vermelhas de feedback)
 from django.contrib import messages
 # Nossos modelos (As tabelas do Banco de Dados)
-from .models import CustomUser, Produtos, Certificacoes
+from .models import CustomUser, Produtos, Certificacoes, PerfilProduto, PerfilEmpresa
 # Nossos formulários (A validação dos dados que entram)
-from .forms import ProdutoForm, ProdutoComAutodeclaracaoForm, CadastroUsuarioForm
+from .forms import ProdutoForm, ProdutoComAutodeclaracaoForm, CadastroUsuarioForm, EditarPerfilProdutorForm
 # Utilitários (ferramentas úteis para data e contagem)
 from datetime import datetime
 from django.db.models import Count
@@ -183,6 +183,39 @@ def cadastro_produto(request):
     return render(request, 'cadastro_produto.html', {'form': form}) 
 
 @login_required
+def editar_perfil_produtor(request):
+    if request.user.tipo_usuario != 'produtor':
+        return redirect('home_publica')
+    
+    # Tenta pegar o perfil. Se não existir, cria um vazio na memória (evita crash)
+    perfil, created = PerfilProduto.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        form = EditarPerfilProdutorForm(request.POST, request.FILES, instance=perfil)
+        
+        if form.is_valid():
+            # 1. Salva os dados do Perfil (Bio, Nome, etc)
+            form.save()
+            
+            # 2. Salva os dados do Usuário (Nome, Email) manualmente
+            request.user.first_name = form.cleaned_data['first_name']
+            request.user.email = form.cleaned_data['email']
+            request.user.save()
+            
+            messages.success(request, 'Perfil atualizado com sucesso!')
+            return redirect('home_produtor')
+    else:
+        # Carrega o formulário com os dados atuais do banco (Preenchimento automático)
+        initial_data = {
+            'first_name': request.user.first_name,
+            'email': request.user.email
+        }
+        form = EditarPerfilProdutorForm(instance=perfil, initial=initial_data)
+
+    return render(request, 'editar_perfil_produtor.html', {'form': form})
+    
+    
+@login_required
 def enviar_autodeclaracao(request):
     # Garantir é sempre bom =)
     if request.user.tipo_usuario != 'produtor':
@@ -204,7 +237,7 @@ def enviar_autodeclaracao(request):
             nova_certificacao = Certificacoes(
                 produto=produto_selecionado,
                 texto_autodeclaracao=texto,
-                documento=arquivo,
+                arquivo_autodeclaracao=arquivo,
                 status_certificacao='pendente', # Nasce pendente
                 admin_responsavel=None, # Ninguém auditou ainda
             )
@@ -268,13 +301,16 @@ def home_empresa(request):
 def home_admin(request):
     # Permite apenas 'auditor' 
     if request.user.tipo_usuario != 'auditor' and not request.user.is_superuser:
-        messages.error(request, 'Acesso restrito a desenvolvedores!')
+        messages.error(request, 'Acesso negado!')
         return redirect('home_publica')
     
     # O auditor vê os dados de TODOS os produtores, por isso não filtramos por usuário aqui.
     pendente = Certificacoes.objects.filter(status_certificacao='pendente').count()
     aprovado = Certificacoes.objects.filter(status_certificacao='aprovado').count()
     reprovado = Certificacoes.objects.filter(status_certificacao='reprovado').count()
+    
+    # Listas as cinco últimas para acesso rápido
+    ultimas = Certificacoes.objects.select_related('produto').order_by('-data_envio')[:5]
     
     contexto = {
         'pendente': pendente,
@@ -297,27 +333,28 @@ def admin_visualizar_certificados(request):
     if status_filtro: 
         consulta = consulta.filter(status_certificacao=status_filtro)
 
-    contexto = {
-        'certificacoes': consulta,
-        'status_filtro': status_filtro,
-        'usuario_nome': request.user.username,
-    }
+    return render(request, 'admin_certificacoes.html', {'certificacoes': consulta, 'status_filtro': status_filtro})
+
+@login_required
+def admin_detalhes_certificacao(request, certificacao_id):
+    if request.user.tipo_usuario != 'auditor' and not request.user.is_superuser:
+        return redirect('home_publica')
+
+    # Busca o certificado pelo ID ou dá erro 404
+    certificacao = get_object_or_404(Certificacoes, id_certificacao=certificacao_id)
     
-    return render(request, 'admin_certificacoes.html', contexto)
+    return render(request, 'admin_detalhes_certificacao.html', {'c': certificacao})
 
 @login_required
 def admin_responder_certificacoes(request, certificacao_id):
     # Segurança mais um vez.
     if request.user.tipo_usuario != 'auditor' and not request.user.is_superuser:
-        return redirect('login')
+        return redirect('home_publica')
     
     certificacao = get_object_or_404(Certificacoes, id_certificacao=certificacao_id)
     
     if request.method == 'POST':
         acao = request.POST.get('acao') # Captura qual botão foi clicado (Aprovar/Rejeitar)
-        # Salva o usuário logado como responsável
-        # Em vez de salvar só o ID, salvamos o OBJETO do usuário logado.
-        admin_responsavel = request.user
         
         if acao == 'aprovar':
             certificacao.status_certificacao = 'aprovado'
@@ -328,11 +365,13 @@ def admin_responder_certificacoes(request, certificacao_id):
             messages.warning(request, f'Certificação REJEITADA para o produto {certificacao.produto.nome}.')
         
         # Registrando o rastro da auditoria (Quem e Quando)
+        certificacao.admin_responsavel = request.user
         certificacao.data_resposta = datetime.now().date()
-        certificacao.admin_responsavel = admin_responsavel
-        # Persistindo no Banco de Dados
         certificacao.save()
         
-        return redirect('admin_visualizar_certificados') 
+    return redirect('admin_visualizar_certificados') 
     
-    return redirect('home_admin')
+
+
+
+

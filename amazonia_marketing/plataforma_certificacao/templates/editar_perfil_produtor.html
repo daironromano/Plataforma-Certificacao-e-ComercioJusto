@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Configurações da Conta{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 700px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+    
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="color: var(--verde-amazonia);">Minha Conta</h2>
+        <p style="color: #666;">Mantenha seus dados de contato e da propriedade sempre atualizados.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="margin-bottom: 15px;">
+                <label><strong>{{ form.first_name.label }}</strong></label>
+                {{ form.first_name }}
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label><strong>{{ form.email.label }}</strong></label>
+                {{ form.email }}
+            </div>
+        </div>
+
+        {% for field in form %}
+            {% if field.name != 'first_name' and field.name != 'email' %}
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small style="color: #888;">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div style="color: red; font-size: 0.85rem;">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <div style="display: flex; gap: 15px; margin-top: 30px;">
+            <button type="submit" class="btn" style="background-color: var(--verde-amazonia); color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; flex: 1;">
+                Salvar Alterações
+            </button>
+            <a href="{% url 'home_produtor' %}" class="btn" style="background-color: #eee; color: #333; padding: 12px 30px; border-radius: 5px; text-decoration: none;">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

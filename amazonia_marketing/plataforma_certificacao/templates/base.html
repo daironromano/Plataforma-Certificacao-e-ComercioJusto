@@ -4,54 +4,89 @@
     <meta charset="UTF-8">
     <title>{% block title %}Amazônia Marketing{% endblock %}</title>
     <style>
-        /* VARIÁVEIS DE COR (Baseadas no Manual da Marca) */
+        /* VARIÁVEIS DE COR */
         :root {
-            --verde-amazonia: #1C3E1D; /* Cor Principal */
-            --amarelo-sol: #DABB2C;    /* Destaques */
-            --azul-rio: #225082;       /* Links/Detalhes */
+            --verde-amazonia: #1C3E1D; 
+            --amarelo-sol: #DABB2C;    
+            --azul-rio: #225082;       
             --fundo: #f4f4f4;
             --texto: #333;
         }
 
         body { font-family: 'Calibri', 'Segoe UI', sans-serif; margin: 0; background-color: var(--fundo); color: var(--texto); display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* CABEÇALHO PADRÃO PARA TODAS AS PÁGINAS HTML (DRY - Fica aqui e aparece em todas as telas) */
-        header { background-color: var(--verde-amazonia); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .logo { font-size: 1rem; font-weight: bold; color: var(--fundol); text-decoration: none;}
-        .nav-links a { color: var(--verde-amazonia); text-decoration: none; margin-left: 15px; font-weight: bold; transition: 0.3s; background-color: var(--amarelo-sol); padding: 6px 12px; border-radius: 2px;}
-        .nav-links a:hover { color: var(--verde-amazonia); background-color: var(--fundo); }
+        /* CABEÇALHO */
+        header { background-color: var(--verde-amazonia); color: white; padding: 1rem 3rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .logo { font-size: 1.2rem; font-weight: bold; color: white; text-decoration: none;}
+        
+        /* BOTÕES DO MENU (NOVOS) */
+        .navbar-right { display: flex; align-items: center; gap: 15px; }
 
-        /* ESTILOS GERAIS DE BOTÕES E FORMULÁRIOS */
+        .btn-nav {
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+        .btn-nav:hover { transform: scale(1.05); }
+
+        /* Cores dos Botões do Menu */
+        .btn-amarelo { background-color: var(--amarelo-sol); color: var(--verde-amazonia); }
+        .btn-entrar { background-color: white; color: var(--verde-amazonia); }
+
+        /* Botão Sair (Discreto) */
+        .btn-sair {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-sair:hover { background: rgba(255,255,255,0.1); }
+
+        /* ESTILOS GERAIS */
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; flex: 1; }
+        footer { background-color: #333; color: white; text-align: center; padding: 0.5rem; margin-top: auto; }
+        
+        /* Botões padrão do sistema */
         .btn { padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; display: inline-block;}
         .btn-primary { background-color: var(--verde-amazonia); color: white; }
         .btn-destaque { background-color: var(--amarelo-sol); color: var(--verde-amazonia); }
         .btn-danger { background-color: #d9534f; color: white; }
-        
-        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; flex: 1; }
-        
         .form-input { width: 100%; padding: 10px; margin: 5px 0 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-
-        footer { background-color: #333; color: white; text-align: center; padding: 1rem; margin-top: auto; }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="{% url 'home_publica' %}" class="logo"> Amazônia Marketing </a>
-        <nav class="nav-links">
+        <a href="{% url 'home_publica' %}" class="logo">Amazônia Marketing</a>
+        
+        <nav class="navbar-right">
             {% if user.is_authenticated %}
-                <span>Olá, {{ user.first_name|default:user.username }}</span>
+                <span style="font-size: 0.9rem;">Olá, {{ user.first_name|default:user.username }}</span>
+                
                 {% if user.tipo_usuario == 'produtor' %}
-                    <a href="{% url 'home_produtor' %}">Meu Painel</a>
-                {% elif user.tipo_usuario == 'admin' %}
-                    <a href="{% url 'home_admin' %}">Painel Administrativo</a>
-                {% elif user.tipo_usario == 'empresa' %}
-                    <a href="{% url 'home_empresa' %}"></a>
+                    <a href="{% url 'home_produtor' %}" class="btn-nav btn-amarelo">Meu Painel</a>
+                
+                {% elif user.tipo_usuario == 'auditor' or user.is_superuser %}
+                    <a href="{% url 'home_admin' %}" class="btn-nav btn-amarelo">Auditoria</a>
+                
+                {% elif user.tipo_usuario == 'empresa' %}
+                    <a href="{% url 'home_empresa' %}" class="btn-nav btn-amarelo">Minha Empresa</a>
                 {% endif %}
                 
-                <a href="{% url 'logout' %}" style="color: var(--verde-amazonia);">Sair</a>
+                <form action="{% url 'logout' %}" method="POST" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-sair">Sair</button>
+                </form>
+
             {% else %}
-                <a href="{% url 'login' %}">Entrar</a>
+                <a href="{% url 'login' %}" class="btn-nav btn-entrar">Entrar</a>
             {% endif %}
         </nav>
     </header>
@@ -69,12 +104,13 @@
                 {% endfor %}
             </div>
         {% endif %}       
+        
         {% block content %}
         {% endblock %}
     </div>
 
     <footer>
-        <p>&copy; 2026 Amazônia Marketing & Consultoria LTDA.</p>
+        <p>&copy; 2026 Amazônia Marketing & Consultoria LTDA. <br>Desenvolvido por: Dairon Romano, Renato Alho, Kezia Lima, Paulo Sérgio</p>
     </footer>
 
 </body>

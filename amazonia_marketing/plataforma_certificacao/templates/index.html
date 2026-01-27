@@ -12,8 +12,6 @@
         text-align: center;
         padding: 60px 20px; 
         margin-bottom: 40px;
-        
-        /* Ajuste para ficar contido e bonito */
         width: 100%;
         border-radius: 10px;
         box-shadow: 0 10px 20px rgba(28, 62, 29, 0.15); 
@@ -44,9 +42,8 @@
     /* GRID DE PRODUTOS */
     .grid {
         display: grid;
-        /* Reduzi para 230px. Isso permite caber 4 cards em telas de laptop padrão */
         grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); 
-        gap: 25px; /* Espaço entre os cards */
+        gap: 25px; 
         padding-bottom: 50px;
     }
 
@@ -58,7 +55,7 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         position: relative;
-        display: flex;       /* Garante que o card estique */
+        display: flex;       
         flex-direction: column;
     }
 
@@ -68,7 +65,7 @@
     }
 
     .card-img-container {
-        height: 200px; /* Altura fixa para alinhar todos */
+        height: 200px; 
         overflow: hidden;
         background-color: #f8f9fa;
         display: flex;
@@ -79,7 +76,7 @@
 
     .card-body {
         padding: 15px;
-        flex-grow: 1; /* Faz o corpo ocupar o espaço restante */
+        flex-grow: 1; 
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -127,11 +124,28 @@
     <h1>Do campo para a mesa</h1>
     <p>Conectando produtores rurais a consumidores conscientes. Produtos certificados e sustentáveis da Amazônia.</p>
 
-    {% if not request.session.usuario_id %}
-        <a href="{% url 'login' %}" class="btn btn-destaque" style="margin-top: 25px; padding: 12px 30px; background-color: white; color: var(--verde-amazonia); border: none; font-weight: bold;">
-            Quero Comprar ou Vender
-        </a>
-    {% endif %}
+    <div style="margin-top: 25px;">
+        {% if user.is_authenticated %}
+            {% if user.tipo_usuario == 'produtor' %}
+                <a href="{% url 'home_produtor' %}" class="btn" style="padding: 12px 30px; background-color: white; color: var(--verde-amazonia); border: none; font-weight: bold; text-decoration: none; border-radius: 5px;">
+                    Acessar Meu Painel
+                </a>
+            {% elif user.tipo_usuario == 'empresa' %}
+                <a href="{% url 'home_empresa' %}" class="btn" style="padding: 12px 30px; background-color: white; color: var(--verde-amazonia); border: none; font-weight: bold; text-decoration: none; border-radius: 5px;">
+                    Painel da Empresa
+                </a>
+            {% elif user.tipo_usuario == 'auditor' or user.is_superuser %}
+                <a href="{% url 'home_admin' %}" class="btn" style="padding: 12px 30px; background-color: white; color: var(--verde-amazonia); border: none; font-weight: bold; text-decoration: none; border-radius: 5px;">
+                    Área de Auditoria
+                </a>
+            {% endif %}
+            
+        {% else %}
+            <a href="{% url 'cadastro' %}" class="btn" style="padding: 12px 30px; background-color: white; color: var(--verde-amazonia); border: none; font-weight: bold; text-decoration: none; border-radius: 5px;">
+                Quero Comprar ou Vender
+            </a>
+        {% endif %}
+    </div>
 </div>
 
 <h2 class="produtos-titulo">Vitrine de Produtos</h2>
@@ -149,7 +163,7 @@
 
             <div class="card-img-container">
                 {% if p.imagem %}
-                    <img src="/media/{{ p.imagem }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="{{ p.imagem.url }}" style="width: 100%; height: 100%; object-fit: cover;">
                 {% else %}
                     <span style="color: #999; font-size: 0.9rem;">Imagem Indisponível</span>
                 {% endif %}

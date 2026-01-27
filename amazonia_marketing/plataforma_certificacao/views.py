@@ -301,13 +301,16 @@ def home_empresa(request):
 def home_admin(request):
     # Permite apenas 'auditor' 
     if request.user.tipo_usuario != 'auditor' and not request.user.is_superuser:
-        messages.error(request, 'Acesso restrito a desenvolvedores!')
+        messages.error(request, 'Acesso negado!')
         return redirect('home_publica')
     
     # O auditor vê os dados de TODOS os produtores, por isso não filtramos por usuário aqui.
     pendente = Certificacoes.objects.filter(status_certificacao='pendente').count()
     aprovado = Certificacoes.objects.filter(status_certificacao='aprovado').count()
     reprovado = Certificacoes.objects.filter(status_certificacao='reprovado').count()
+    
+    # Listas as cinco últimas para acesso rápido
+    ultimas = Certificacoes.objects.select_related('produto').order_by('-data_envio')[:5]
     
     contexto = {
         'pendente': pendente,
@@ -330,27 +333,28 @@ def admin_visualizar_certificados(request):
     if status_filtro: 
         consulta = consulta.filter(status_certificacao=status_filtro)
 
-    contexto = {
-        'certificacoes': consulta,
-        'status_filtro': status_filtro,
-        'usuario_nome': request.user.username,
-    }
+    return render(request, 'admin_certificacoes.html', {'certificacoes': consulta, 'status_filtro': status_filtro})
+
+@login_required
+def admin_detalhes_certificacao(request, certificacao_id):
+    if request.user.tipo_usuario != 'auditor' and not request.user.is_superuser:
+        return redirect('home_publica')
+
+    # Busca o certificado pelo ID ou dá erro 404
+    certificacao = get_object_or_404(Certificacoes, id_certificacao=certificacao_id)
     
-    return render(request, 'admin_certificacoes.html', contexto)
+    return render(request, 'admin_detalhes_certificacao.html', {'c': certificacao})
 
 @login_required
 def admin_responder_certificacoes(request, certificacao_id):
     # Segurança mais um vez.
     if request.user.tipo_usuario != 'auditor' and not request.user.is_superuser:
-        return redirect('login')
+        return redirect('home_publica')
     
     certificacao = get_object_or_404(Certificacoes, id_certificacao=certificacao_id)
     
     if request.method == 'POST':
         acao = request.POST.get('acao') # Captura qual botão foi clicado (Aprovar/Rejeitar)
-        # Salva o usuário logado como responsável
-        # Em vez de salvar só o ID, salvamos o OBJETO do usuário logado.
-        admin_responsavel = request.user
         
         if acao == 'aprovar':
             certificacao.status_certificacao = 'aprovado'
@@ -361,11 +365,13 @@ def admin_responder_certificacoes(request, certificacao_id):
             messages.warning(request, f'Certificação REJEITADA para o produto {certificacao.produto.nome}.')
         
         # Registrando o rastro da auditoria (Quem e Quando)
+        certificacao.admin_responsavel = request.user
         certificacao.data_resposta = datetime.now().date()
-        certificacao.admin_responsavel = admin_responsavel
-        # Persistindo no Banco de Dados
         certificacao.save()
         
-        return redirect('admin_visualizar_certificados') 
+    return redirect('admin_visualizar_certificados') 
     
-    return redirect('home_admin')
+
+
+
+

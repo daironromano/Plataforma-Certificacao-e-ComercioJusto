@@ -6,8 +6,8 @@
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h2 style="color: var(--verde-amazonia); margin: 0;">Auditoria de Documentos</h2>
     <div>
-        <a href="?status=pendente" class="btn" style="background: #e2e6ea;">Apenas Pendentes</a>
-        <a href="?" class="btn" style="background: #e2e6ea;">Todas</a>
+        <a href="?status=pendente" class="btn" style="background: #e2e6ea; padding: 8px 15px; border-radius: 4px; text-decoration: none; color: #333;">Apenas Pendentes</a>
+        <a href="?" class="btn" style="background: #e2e6ea; padding: 8px 15px; border-radius: 4px; text-decoration: none; color: #333;">Todas</a>
     </div>
 </div>
 
@@ -26,32 +26,33 @@
             {% for cert in certificacoes %}
             <tr style="border-bottom: 1px solid #eee;">
                 <td style="padding: 15px; font-weight: bold;">{{ cert.produto.nome }}</td>
-                <td style="padding: 15px;">{{ cert.produto.usuario.nome }}</td>
+                
+                <td style="padding: 15px;">
+                    {{ cert.produto.usuario.first_name|default:cert.produto.usuario.username }}
+                </td>
+                
                 <td style="padding: 15px;">
                     {% if cert.documento %}
-                        <a href="{{ cert.documento.url }}" target="_blank" style="color: var(--azul-rio); font-weight: bold; text-decoration: none;">
+                        <a href="{{ cert.documento.url }}" target="_blank" style="color: #007bff; font-weight: bold; text-decoration: none;">
                             📄 Baixar PDF
                         </a>
                     {% else %}
                         <span style="color: #999;">Sem anexo</span>
                     {% endif %}
                 </td>
+                
                 <td style="padding: 15px;">{{ cert.data_envio|date:"d/m/Y" }}</td>
                 
                 <td style="padding: 15px; text-align: center;">
                     {% if cert.status_certificacao == 'pendente' %}
-                        <form method="POST" action="{% url 'admin_responder_certificacao' cert.id_certificacao %}">
-                            {% csrf_token %}
-                            <button type="submit" name="acao" value="aprovar" class="btn btn-primary" style="padding: 6px 12px; margin-right: 5px;">
-                                ✅ Aprovar
-                            </button>
-                            <button type="submit" name="acao" value="rejeitar" class="btn btn-danger" style="background: #d9534f; padding: 6px 12px;">
-                                ❌ Rejeitar
-                            </button>
-                        </form>
+                        <a href="{% url 'admin_detalhes' cert.id_certificacao %}" 
+                           class="btn" 
+                           style="background-color: #007bff; color: white; padding: 6px 15px; text-decoration: none; border-radius: 4px; display: inline-block; font-size: 0.9rem;">
+                            Analisar
+                        </a>
                     {% else %}
                         <span style="font-weight: bold; text-transform: uppercase;
-                            color: {% if cert.status_certificacao == 'aprovado' %}green{% else %}red{% endif %};">
+                            color: {% if cert.status_certificacao == 'aprovado' %}green{% elif cert.status_certificacao == 'reprovado' %}red{% else %}orange{% endif %};">
                             {{ cert.status_certificacao }}
                         </span>
                     {% endif %}

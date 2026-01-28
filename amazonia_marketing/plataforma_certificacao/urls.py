@@ -2,17 +2,19 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.urls import include
 
 
-urlpatterns = [   
-    path('', views.home_publica, name='home_publica'), # Tela inicial pública
-    
-    # Rotas de Autenticação e Cadastro
-    path('registration/login/', views.login_usuarios, name='login'),
-    path('registration/escolher-tipo/', views.escolher_tipo_cadastro, name='escolher_tipo_cadastro'),
-    path('registration/escolher-tipo-google/', views.escolher_tipo_apos_google, name='escolher_tipo_google'),
-    path('registration/cadastro-produtor/', views.cadastro_produtor, name='cadastro_produtor'),
-    path('registration/cadastro-empresa/', views.cadastro_empresa, name='cadastro_empresa'),
+urlpatterns = [
+    path('accounts/', include('allauth.urls')),   
+    path('', views.home_publica, name='home_publica'), # Essa é a rota da tela inicial para sem logar
+    path('registration/login/', views.login_usuarios, name='login'), # Rota para usuários cadastrados
+    path('registration/cadastro/', views.cadastro_usuario, name='cadastro'), # Rota para cadastrar usuários    
+    path('produtor/dashboard/', views.home_produtor, name='home_produtor'), # Rota protegida: produtor
+    path('produtor/perfil/editar/', views.editar_perfil_produtor, name='editar_perfil_produtor'),
+    path('empresa/dashboard/', views.home_empresa, name='home_empresa'), # Rota protegida: empresa
+    path('auditoria/dashboard', views.home_admin, name='home_admin'), # Rota protegida: admin
+    path('home/', views.home_publica, name='home_publica'),
     path('logout/', views.logout_view, name='logout'),
     
     # Rotas protegidas por tipo de usuário

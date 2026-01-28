@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, allauth
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,18 +33,21 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'django.contrib.sites',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',                   # Necessário para django-allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.google', # Provedor Google para django-allauth
-    'plataforma_certificacao',
+    'allauth.socialaccount.providers.google',
+     'plataforma_certificacao',
 ]
+SITE_ID = 1
+LOGIN_REDIRECT_URL = '/'
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 AUTHETICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend', # Backend padrão do Django
@@ -62,7 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',  # Middleware do allauth
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'amazonia_marketing.urls'
@@ -168,49 +171,15 @@ ALLOWED_UPLOAD_MIME_TYPES = [
 
 AUTH_USER_MODEL = 'plataforma_certificacao.CustomUser'
 
-# ============================================
-# Configurações do django-allauth
-# ============================================
-
-# ID do site (necessário para allauth)
-SITE_ID = 1
-
-# Backends de autenticação
-AUTHENTICATION_BACKENDS = [
-    # Backend padrão do Django
+AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    
-    # Backend do allauth para social login
     'allauth.account.auth_backends.AuthenticationBackend',
-]
+)
 
-# Configurações de autenticação
-LOGIN_REDIRECT_URL = '/'  # Para onde redirecionar após login
-ACCOUNT_LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
-ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_EMAIL_VERIFICATION = 'optional'  # 'mandatory' para obrigar verificação
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
-# Configurações do provedor Google
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-            'prompt': 'select_account',  # força o Google a mostrar o seletor de contas
-        },
-        # Nota: As credenciais devem ser configuradas no Django Admin
-        # em Social Applications, não aqui no código
-    }
-}
-
-# Adapter customizado para mapear dados do Google para UsuarioBase
-SOCIALACCOUNT_ADAPTER = 'plataforma_certificacao.adapters.CustomSocialAccountAdapter'
-SOCIALACCOUNT_QUERY_EMAIL = True
-
-# Pular tela de sign in e ir direto para o login com a conta social
-SOCIALACCOUNT_LOGIN_ON_GET = True
-
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'

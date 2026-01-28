@@ -156,6 +156,47 @@
             margin-top: 10px;
             text-decoration: none;
         }
+        .entra_login {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .btn-google {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            width: 100%;
+            padding: 12px;
+
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+
+            background-color: #fff;
+            color: #3c4043;
+            font-weight: 500;
+            font-size: 14px;
+
+            text-decoration: none;
+            cursor: pointer;
+
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-google:hover {
+            background-color: #f7f8f8;
+            box-shadow: 0 1px 3px rgba(60,64,67,0.3);
+        }
+
+        .btn-google img {
+            width: 20px;
+            height: 20px;
+        }
+
+
+
+
     </style>
 </head>
 <body>
@@ -202,6 +243,16 @@
             <p class="esqueceu">
                 Novo Usuário? <br><a href="{% url 'escolher_tipo_cadastro' %}" style="text-decoration: none; color: #1C3E1D; font-weight: bold;">Clique aqui</a>
             </p>
+
+
+            <div class="entra_login">
+            {% load socialaccount %}
+
+            <a href="{% provider_login_url 'google' %}" class="btn-google">
+                 <img src="{% static 'icons8-google-32.png' %}" alt="">
+                        <span>Entrar com Google</span>                                
+            </a>
+            </div>   
         </form>
     </div>
 

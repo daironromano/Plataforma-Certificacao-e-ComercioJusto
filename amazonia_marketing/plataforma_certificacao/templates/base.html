@@ -68,10 +68,60 @@
         
         footer { background-color: #333; color: white; text-align: center; padding: 1rem; margin-top: auto; }
 
+        /* Estilo padrão (Computador) */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+     background-color: var(--verde-amazonia); /* Verde Amazônia */
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.menu-btn {
+    display: none; /* Escondido no PC */
+    font-size: 30px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* Estilo para Celular (Telas menores que 768px) */
+@media (max-width: 768px) {
+    .menu-btn {
+        display: block; /* Aparece no celular */
+    }
+
+    .nav-links {
+        display: none; /* Esconde os links por padrão */
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: var(--verde-amazonia);
+        width: 100%;
+        padding: 20px;
+        z-index: 1000;
+    }
+
+    /* Quando clicamos no botão, essa classe é ativada pelo JS */
+    .nav-links.active {
+        display: flex;
+    }
+}
+
+
     </style>
 </head>
 <body>
  {% load static %}
+
     <header>
 
         <a href="{% url 'home_publica' %}" class="logo">
@@ -103,9 +153,32 @@
 
             {% else %}
                 <a href="{% url 'login' %}" class="btn-nav btn-entrar">Entrar</a>
+
+    <header class="main-header">
+    <div class="logo-container">
+        <a href="{% url 'home_publica' %}">
+            <img src="{% static 'imagem-branca.png' %}" class="logo-img">
+        </a>
+    </div>
+
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+    <nav class="nav-links" id="navLinks">
+        {% if user.is_authenticated %}
+            <span>Olá, {{ user.first_name|default:user.username }}</span>
+            {% if user.tipo_usuario == 'produtor' %}
+                <a href="{% url 'home_produtor' %}">Meu Painel</a>
+            {% elif user.tipo_usuario == 'admin' %}
+                <a href="{% url 'home_admin' %}">Painel Administrativo</a>
+
+
             {% endif %}
-        </nav>
-    </header>
+            <a href="{% url 'logout' %}" class="btn-sair">Sair</a>
+        {% else %}
+            <a href="{% url 'login' %}">Entrar</a>
+        {% endif %}
+    </nav>
+</header>
 
     <div class="container">
         {% if messages %}
@@ -124,7 +197,13 @@
         {% block content %}
         {% endblock %}
     </div>
-
+<script>
+function toggleMenu() {
+    const nav = document.getElementById('navLinks');
+    // Adiciona ou remove a classe 'active' toda vez que clica
+    nav.classList.toggle('active');
+}
+</script>
     <footer>
         <p>&copy; 2026 Amazônia Marketing & Consultoria LTDA. <br>Desenvolvido por: Dairon Romano, Renato Alho, Kezia Lima, Paulo Sérgio</p>
     </footer>

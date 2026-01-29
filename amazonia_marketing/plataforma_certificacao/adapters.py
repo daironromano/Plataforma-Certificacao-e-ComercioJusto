@@ -1,6 +1,6 @@
 """
 Adapters customizados para django-allauth.
-Mapeiam dados do Google OAuth para o modelo UsuarioBase.
+Mapeiam dados do Google OAuth para o modelo CustomUser.
 """
 
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter, get_adapter
@@ -10,8 +10,7 @@ from allauth.account.utils import perform_login
 from allauth.exceptions import ImmediateHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.contrib.auth.models import User
-from .models import UsuarioBase, Produtor, Empresa
+from .models import CustomUser, Produtor, EmpresaProdutor
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -39,13 +38,13 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         
         # Verifica se já existe um usuário Django com esse email
         try:
-            user = User.objects.get(email__iexact=email)
+            user = CustomUser.objects.get(email__iexact=email)
             # Encontrou! Conecta a conta social ao usuário existente
             # Isso permite que um usuário que se cadastrou manualmente
             # possa fazer login com Google depois
             sociallogin.connect(request, user)
             raise ImmediateHttpResponse(redirect(self.get_login_redirect_url(request)))
-        except User.DoesNotExist:
+        except CustomUser.DoesNotExist:
             # Usuário novo - se ele ainda não escolheu o tipo, pausamos o fluxo
             if not request.session.get('tipo_usuario_social'):
                 # Guarda dados mínimos para mostrar na tela de escolha
@@ -80,7 +79,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def save_user(self, request, sociallogin, form=None):
         """
         Salva o usuário após login social.
-        Aqui criamos o UsuarioBase e User com dados do Google.
+        Aqui criamos o CustomUser e perfis específicos com dados do Google.
         """
         # Pega dados do Google
         google_data = sociallogin.account.extra_data
@@ -99,27 +98,21 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             }
             raise ImmediateHttpResponse(redirect(reverse('escolher_tipo_google')))
         
-        # Chama a implementação padrão do save_user que cria o User do Django
+        # Chama a implementação padrão do save_user que cria o CustomUser
         # Este método já foi populado pelo populate_user
         user = super().save_user(request, sociallogin, form)
         
         # IMPORTANTE: user já foi salvo pela super().save_user()
-        # Agora criar UsuarioBase associado a este usuário
-        usuario_base, created = UsuarioBase.objects.get_or_create(
-            email=email.lower(),
-            defaults={
-                'nome': nome,
-                'tipo': tipo.lower(),
-                'user': user,
-            }
-        )
+        # Atualizar o tipo de usuário no CustomUser
+        user.tipo = tipo.lower()
+        user.nome = nome
+        user.save()
         
         # Se foi criado novo, cria o perfil específico (Produtor ou Empresa)
-        if created:
-            if tipo.lower() == 'produtor':
-                Produtor.objects.create(usuario=usuario_base)
-            elif tipo.lower() == 'empresa':
-                Empresa.objects.create(usuario=usuario_base)
+        if tipo.lower() == 'produtor':
+            Produtor.objects.get_or_create(usuario=user)
+        elif tipo.lower() == 'empresa':
+            EmpresaProdutor.objects.get_or_create(usuario=user)
         
         # Limpa dados da sessão
         if 'tipo_usuario_social' in request.session:
@@ -156,24 +149,17 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             return '/registration/escolher-tipo-google/'
         
         # Senão, redireciona baseado no tipo de usuário
-        try:
-            # Se o usuário tem um email válido
-            email = request.user.email if hasattr(request.user, 'email') else None
-            if not email and hasattr(request.user, 'usuario_base'):
-                email = request.user.usuario_base.email
+        if request.user and request.user.is_authenticated:
+            tipo = getattr(request.user, 'tipo', None)
             
-            if email:
-                usuario = UsuarioBase.objects.get(email__iexact=email)
-                tipo = usuario.tipo.lower()
-                
+            if tipo:
+                tipo = tipo.lower()
                 if tipo == 'produtor':
                     return '/produtor/dashboard/'
                 elif tipo == 'empresa':
                     return '/empresa/dashboard/'
                 elif tipo == 'admin':
                     return '/admin/dashboard/'
-        except (UsuarioBase.DoesNotExist, AttributeError):
-            pass
         
         # Fallback para página inicial
         return '/'

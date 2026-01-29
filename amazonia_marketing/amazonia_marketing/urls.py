@@ -20,6 +20,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    # Incluir todas as URLs do app plataforma_certificacao
+    path('', include('plataforma_certificacao.urls')),
+    
+    # Django Admin (deve vir por último)
     path('admin/', admin.site.urls),
     path('', include('plataforma_certificacao.urls')),
     

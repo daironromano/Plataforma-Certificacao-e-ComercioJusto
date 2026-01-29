@@ -141,7 +141,7 @@
             {% endif %}
             
         {% else %}
-            <a href="{% url 'cadastro' %}" class="btn" style="padding: 12px 30px; background-color: white; color: var(--verde-amazonia); border: none; font-weight: bold; text-decoration: none; border-radius: 5px;">
+            <a href="{% url 'escolher_tipo_cadastro' %}" class="btn" style="padding: 12px 30px; background-color: white; color: var(--verde-amazonia); border: none; font-weight: bold; text-decoration: none; border-radius: 5px;">
                 Quero Comprar ou Vender
             </a>
         {% endif %}
@@ -157,7 +157,7 @@
             
             {% if p.tem_selo %}
                 <div class="selo-flutuante">
-                    ⭐ Certificado
+                    Certificado
                 </div>
             {% endif %}
 
@@ -183,11 +183,11 @@
                     <div style="display: flex; gap: 0.5rem;">
                         {% if request.session.usuario_id %}
                         <a href="{% url 'adicionar_ao_carrinho' p.id_produto %}" style="flex: 1; padding: 10px; background-color: var(--amarelo-sol); color: var(--verde-amazonia); border: none; border-radius: 6px; text-align: center; text-decoration: none; font-weight: bold; transition: background 0.2s;">
-                            🛒 Comprar
+                            Comprar
                         </a>
                         {% else %}
                         <a href="{% url 'login' %}" style="flex: 1; padding: 10px; background-color: var(--amarelo-sol); color: var(--verde-amazonia); border: none; border-radius: 6px; text-align: center; text-decoration: none; font-weight: bold; transition: background 0.2s;">
-                            🛒 Comprar
+                            Comprar
                         </a>
                         {% endif %}
                     </div>

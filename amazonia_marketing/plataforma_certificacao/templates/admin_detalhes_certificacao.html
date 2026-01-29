@@ -5,8 +5,8 @@
 {% block content %}
 <div class="container" style="max-width: 1000px; margin: 30px auto;">
     
-    <a href="{% url 'admin_visualizar_certificados' %}" style="text-decoration: none; color: #666; display: flex; align-items: center; gap: 5px; margin-bottom: 20px;">
-        ⬅ Voltar para a Lista
+    <a href="{% url 'admin_visualizar_certificacoes' %}" style="text-decoration: none; color: #666; display: flex; align-items: center; gap: 5px; margin-bottom: 20px;">
+        ← Voltar para a Lista
     </a>
 
     <div style="background: white; padding: 20px; border-radius: 8px; border-bottom: 4px solid var(--verde-amazonia); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
@@ -41,7 +41,7 @@
             <p><strong>Categoria:</strong> {{ c.produto.categoria }}</p>
             <p><strong>Preço:</strong> R$ {{ c.produto.preco }}</p>
             <hr>
-            <p><strong>Produtor:</strong> {{ c.produto.usuario.first_name }}</p>
+            <p><strong>Produtor:</strong> {{ c.produto.usuario.nome }}</p>
             <p><strong>Email:</strong> {{ c.produto.usuario.email }}</p>
         </div>
 
@@ -56,7 +56,7 @@
             <p style="font-weight: bold;">Documento Anexo:</p>
             {% if c.documento %}
                 <a href="{{ c.documento.url }}" target="_blank" class="btn" style="background: #6c757d; color: white; display: block; text-align: center; margin-bottom: 20px;">
-                    📎 Baixar/Visualizar Arquivo
+                    Baixar/Visualizar Arquivo
                 </a>
             {% else %}
                 <p style="color: red;">Nenhum arquivo enviado.</p>

@@ -7,10 +7,10 @@
 <div class="container" style="max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
     
     <!-- Cabeçalho -->
-    <div style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #1C3E1D 0%, #1a3217 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h1 style="margin: 0 0 0.5rem 0;">&#128203; Certifica&ccedil;&atilde;o #{{ certificacao.id_certificacao }}</h1>
+                <h1 style="margin: 0 0 0.5rem 0;">Certificação #{{ certificacao.id_certificacao }}</h1>
                 <p style="margin: 0; opacity: 0.9;">Análise completa da solicitação</p>
             </div>
             <div style="text-align: right;">
@@ -34,8 +34,8 @@
         <div>
             <!-- Card: Informações do Produto -->
             <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
-                <h2 style="color: #2c3e50; border-bottom: 2px solid #9b59b6; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                    &#128230; Produto Certificado
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    Produto Certificado
                 </h2>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -72,12 +72,12 @@
 
             <!-- Card: Autodeclaração -->
             <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
-                <h2 style="color: #2c3e50; border-bottom: 2px solid #9b59b6; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                    &#9997;&#65039; Autodeclara&ccedil;&atilde;o
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    Autodeclaração
                 </h2>
                 
                 {% if certificacao.texto_autodeclaracao %}
-                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #9b59b6;">
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #1C3E1D;">
                     <p style="margin: 0; line-height: 1.6; color: #2c3e50; white-space: pre-wrap;">{{ certificacao.texto_autodeclaracao }}</p>
                 </div>
                 {% else %}
@@ -87,8 +87,8 @@
 
             <!-- Card: Documentos -->
             <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
-                <h2 style="color: #2c3e50; border-bottom: 2px solid #9b59b6; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                    &#128206; Documentos Anexados
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    Documentos Anexados
                 </h2>
                 
                 <div style="display: flex; flex-direction: column; gap: 0.75rem;">
@@ -123,8 +123,8 @@
         <div>
             <!-- Card: Informações do Produtor -->
             <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
-                <h2 style="color: #2c3e50; border-bottom: 2px solid #9b59b6; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                    &#128100; Produtor
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    Produtor
                 </h2>
                 
                 <div style="margin-bottom: 1rem;">
@@ -154,8 +154,8 @@
 
             <!-- Card: Informações da Certificação -->
             <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
-                <h2 style="color: #2c3e50; border-bottom: 2px solid #9b59b6; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                    &#128197; Informa&ccedil;&otilde;es Temporais
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    Informações Temporais
                 </h2>
                 
                 <div style="margin-bottom: 1rem;">
@@ -188,8 +188,8 @@
             <!-- Card: Ações (apenas se pendente) -->
             {% if certificacao.status_certificacao == 'pendente' %}
             <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                <h2 style="color: #2c3e50; border-bottom: 2px solid #9b59b6; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                    ⚡ Ações
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    Ações
                 </h2>
                 
                 <form method="post" action="{% url 'admin_responder_certificacao' certificacao.id_certificacao %}">

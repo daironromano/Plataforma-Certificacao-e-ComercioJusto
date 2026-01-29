@@ -91,12 +91,19 @@
                 {% endif %}
             </div>
             
+            <!-- Aviso sobre Documentação -->
+            <div style="background: #e7f3ff; border-left: 4px solid #007bff; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                <p style="margin: 0; color: #004085; font-size: 0.9rem;">
+                    <strong>ℹ️ Importante:</strong> Após criar a conta, você precisará enviar documentação (CNPJ, Contrato Social e Alvará) para aprovação.
+                </p>
+            </div>
+            
             <!-- Botões -->
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; margin-bottom: 15px;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; margin-bottom: 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
                 Cadastrar Empresa
             </button>
             
-            <a href="{% url 'escolher_tipo_cadastro' %}" class="btn btn-secondary" style="width: 100%; padding: 12px; display: inline-block; text-align: center; text-decoration: none;">
+            <a href="{% url 'escolher_tipo_cadastro' %}" class="btn btn-secondary" style="width: 100%; padding: 12px; display: inline-block; text-align: center; text-decoration: none; background-color: #6c757d; color: white; border-radius: 5px; font-weight: bold;">
                 Voltar
             </a>
         </form>

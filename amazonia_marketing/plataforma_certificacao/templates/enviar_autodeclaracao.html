@@ -16,12 +16,16 @@
         
         <div style="margin-bottom: 20px;">
             <label style="font-weight: bold; display: block; margin-bottom: 5px; color: var(--verde-amazonia);">
-                {{ form.produto.label }}
+                Selecione um Produto *
             </label>
-            {{ form.produto }} 
-            {% if form.produto.errors %}
-                <small style="color: red;">{{ form.produto.errors }}</small>
-            {% endif %}
+            <select name="produto_id" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px;">
+                <option value="">-- Escolha um produto --</option>
+                {% for produto in produtos %}
+                    <option value="{{ produto.id_produto }}">{{ produto.nome }}</option>
+                {% empty %}
+                    <option value="" disabled>Nenhum produto cadastrado</option>
+                {% endfor %}
+            </select>
         </div>
 
         <div style="margin-bottom: 20px;">
@@ -31,16 +35,33 @@
             {{ form.texto_autodeclaracao }}
         </div>
 
-        <div style="margin-bottom: 30px; background-color: #f9f9f9; padding: 15px; border-radius: 5px; border: 1px dashed #ccc;">
+        <div style="margin-bottom: 20px;">
             <label style="font-weight: bold; display: block; margin-bottom: 5px; color: var(--verde-amazonia);">
-                {{ form.arquivo_autodeclaracao.label }}
+                {{ form.documento.label }}
             </label>
-            {{ form.arquivo_autodeclaracao }}
-            <p style="font-size: 0.8rem; color: #888; margin-top: 5px;">
-                {{ form.arquivo_autodeclaracao.help_text }}
-            </p>
-            {% if form.arquivo_autodeclaracao.errors %}
-                <small style="color: red;">{{ form.arquivo_autodeclaracao.errors }}</small>
+            {{ form.documento }}
+            {% if form.documento.errors %}
+                <small style="color: red;">{{ form.documento.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px; color: var(--verde-amazonia);">
+                {{ form.documento_2.label }}
+            </label>
+            {{ form.documento_2 }}
+            {% if form.documento_2.errors %}
+                <small style="color: red;">{{ form.documento_2.errors }}</small>
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px; color: var(--verde-amazonia);">
+                {{ form.documento_3.label }}
+            </label>
+            {{ form.documento_3 }}
+            {% if form.documento_3.errors %}
+                <small style="color: red;">{{ form.documento_3.errors }}</small>
             {% endif %}
             
             {% if form.non_field_errors %}

@@ -38,13 +38,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',  # Necessário para django-allauth
-    'plataforma_certificacao',
+    'django.contrib.sites',                   # Necessário para django-allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.google', # Provedor Google para django-allauth
+    'plataforma_certificacao',
 ]
+
+AUTHETICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend', # Backend padrão do Django
+    'allauth.account.auth_backends.AuthenticationBackend', # Backend do allauth
+]
+
+SITE_ID = 1  # Necessário para django-allauth
+LOGIN_REDIRECT_URL = '/'  # Redireciona para a página inicial após login
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -54,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # Middleware do allauth
     'allauth.account.middleware.AccountMiddleware',  # Middleware do allauth
 ]
 
@@ -84,11 +93,16 @@ WSGI_APPLICATION = 'amazonia_marketing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Engine padrão do Django para MySQL
+        'ENGINE': 'django.db.backends.mysql',  # Engine padrão do Django para MySQL
         'NAME': 'amazonia_marketing',          # Nome exato do banco que criamos
-        'USER': 'root',                        # Seu usuário do MySQL
-        'PASSWORD': 'user2006',                # Senha
+        'USER': 'django_user',                 # Seu usuário do MySQL
+        'PASSWORD': 'django123',               # Senha
         'HOST': '127.0.0.1',                   # Localhost
         'PORT': '3306',                        # Porta padrão
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+        },
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
@@ -141,14 +155,27 @@ MEDIA_URL = '/media/'
 # Endereço físico do meu computador - > fotos serão guardadas na pasta media
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Para a segurança de upload definimos os tipos de arquivos aceitos
+# Configurações de Upload de Arquivos
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB em bytes
+
+# Extensões permitidas para upload
+ALLOWED_UPLOAD_EXTENSIONS = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
+
+# MIME types permitidos para upload
 ALLOWED_UPLOAD_MIME_TYPES = [
-    'application/pdf', # .pdf
-    'application/msword', # .doc
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', # .docx
-    'image/jpeg', # .jpg e jpeg
-    'image/png', # .png   
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'image/jpeg',
+    'image/png',
 ]
+
+# ============================================
+# Configuração de Autenticação Customizada
+# ============================================
+
+# Modelo de usuário customizado (LOGIN COM EMAIL)
+AUTH_USER_MODEL = 'plataforma_certificacao.CustomUser'
 
 # ============================================
 # Configurações do django-allauth
@@ -159,7 +186,7 @@ SITE_ID = 1
 
 # Backends de autenticação
 AUTHENTICATION_BACKENDS = [
-    # Backend padrão do Django
+    # Backend padrão do Django (para CustomUser)
     'django.contrib.auth.backends.ModelBackend',
     
     # Backend do allauth para social login
@@ -196,8 +223,3 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 # Pular tela de sign in e ir direto para o login com a conta social
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
-
-
-# AVISANDO O DJANGO DO CUSTOMUSER
-
-AUTH_USER_MODEL = 'plataforma_certificacao.CustomUser'

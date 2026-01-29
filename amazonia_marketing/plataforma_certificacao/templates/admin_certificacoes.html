@@ -28,7 +28,7 @@
                 <td style="padding: 15px; font-weight: bold;">{{ cert.produto.nome }}</td>
                 
                 <td style="padding: 15px;">
-                    {{ cert.produto.usuario.first_name|default:cert.produto.usuario.username }}
+                    {{ cert.produto.usuario.nome|default:cert.produto.usuario.email }}
                 </td>
                 
                 <td style="padding: 15px;">

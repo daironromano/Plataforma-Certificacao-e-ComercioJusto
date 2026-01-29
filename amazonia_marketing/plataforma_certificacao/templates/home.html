@@ -8,21 +8,21 @@
     
     <!-- Seção de Boas-Vindas -->
     <div style="background: linear-gradient(135deg, #1C3E1D 0%, #27ae60 100%); color: white; padding: 3rem 2rem; border-radius: 12px; text-align: center; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h1 style="margin: 0 0 1rem 0; font-size: 2.5rem;">Bem-vindo à Amazônia Marketing</h1>
+        <h1 style="margin: 0 0 1rem 0; font-size: 2.5rem;">Do Campo para a Mesa</h1>
         <p style="margin: 0; font-size: 1.2rem; opacity: 0.9;">
             Conectando produtores da Amazônia com o mundo através do comércio justo e sustentável
         </p>
     </div>
 
     <!-- Mensagem para usuário autenticado -->
-    {% if request.session.usuario_id %}
+    {% if request.user.is_authenticated %}
     <div style="background: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <h2 style="color: #1C3E1D; margin-top: 0;">Olá, {{ request.session.usuario_nome }}! 👋</h2>
+        <h2 style="color: #1C3E1D; margin-top: 0;">Olá, {{ request.user.nome }}! 👋</h2>
         <p style="color: #666; font-size: 1.1rem;">Escolha uma das opções abaixo para navegar:</p>
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
             
-            {% if request.session.usuario_tipo == 'produtor' %}
+            {% if request.user.tipo == 'produtor' %}
             <a href="{% url 'home_produtor' %}" style="display: block; padding: 2rem; background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; text-decoration: none; border-radius: 12px; text-align: center; transition: transform 0.3s, box-shadow 0.3s;">
                 <div style="font-size: 3rem; margin-bottom: 0.5rem;">🌱</div>
                 <h3 style="margin: 0 0 0.5rem 0;">Painel do Produtor</h3>
@@ -30,7 +30,7 @@
             </a>
             {% endif %}
             
-            {% if request.session.usuario_tipo == 'empresa' %}
+            {% if request.user.tipo == 'empresa' %}
             <a href="{% url 'home_empresa' %}" style="display: block; padding: 2rem; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; text-decoration: none; border-radius: 12px; text-align: center; transition: transform 0.3s, box-shadow 0.3s;">
                 <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏢</div>
                 <h3 style="margin: 0 0 0.5rem 0;">Painel da Empresa</h3>
@@ -38,7 +38,7 @@
             </a>
             {% endif %}
             
-            {% if request.session.usuario_tipo == 'admin' %}
+            {% if request.user.tipo == 'admin' %}
             <a href="{% url 'home_admin' %}" style="display: block; padding: 2rem; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; text-decoration: none; border-radius: 12px; text-align: center; transition: transform 0.3s, box-shadow 0.3s;">
                 <div style="font-size: 3rem; margin-bottom: 0.5rem;">👨‍💼</div>
                 <h3 style="margin: 0 0 0.5rem 0;">Painel Administrativo</h3>
@@ -56,8 +56,8 @@
     {% else %}
     <!-- Mensagem para visitantes não autenticados -->
     <div style="background: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
-        <h2 style="color: #1C3E1D; margin-top: 0;">Você ainda não está autenticado</h2>
-        <p style="color: #666; font-size: 1.1rem; margin-bottom: 1.5rem;">Faça login ou cadastre-se para acessar todas as funcionalidades</p>
+        <h2 style="color: #1C3E1D; margin-top: 0;">Quero Comprar ou Vender</h2>
+        <p style="color: #666; font-size: 1.1rem; margin-bottom: 1.5rem;">Junte-se a nossa comunidade de produtores e empresas compradores</p>
         
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
             <a href="{% url 'login' %}" style="padding: 1rem 2rem; background: #1C3E1D; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: transform 0.3s;">
@@ -68,7 +68,6 @@
             </a>
         </div>
     </div>
-    {% endif %}
 
     <!-- Seção de Recursos -->
     <div style="margin-top: 3rem;">

@@ -305,7 +305,37 @@ class Marketplace(models.Model):
         return f"Anúncio {self.id_anuncio} - {self.plataforma}"
 
 
+        return f"Certificação {self.id_certificacao} - {self.produto.nome}"
+
+
+class Marketplace(models.Model):
+    """
+    Model para gerenciar anúncios e conteúdo gerado para marketplaces.
+    """
+    id_anuncio = models.AutoField(primary_key=True)
+    plataforma = models.CharField(max_length=80)
+    conteudo_gerado = models.TextField(blank=True, null=True)
+    data_geracao = models.DateField(blank=True, null=True)
+    produto = models.ForeignKey('Produtos', models.DO_NOTHING, db_column='produto_id')
+
+    class Meta:
+        db_table = 'Marketplace'
+        verbose_name = 'Anúncio Marketplace'
+        verbose_name_plural = 'Anúncios Marketplace'
+    
+    def __str__(self):
+        return f"Anúncio {self.id_anuncio} - {self.plataforma}"
+
+
 class Produtos(models.Model):
+    """
+    Model para gerenciar produtos vendidos pelos usuários.
+    """
+    STATUS_ESTOQUE_CHOICES = [
+        ('disponivel', 'Disponível'),
+        ('esgotado', 'Esgotado'),
+    ]
+    
     """
     Model para gerenciar produtos vendidos pelos usuários.
     """
@@ -406,7 +436,47 @@ class ItemCarrinho(models.Model):
     Model para itens individuais dentro do carrinho.
     """
     carrinho = models.ForeignKey(Carrinho, on_delete=models.CASCADE, related_name='itens')
+        return f"Carrinho de {self.usuario.nome} - {self.data_criacao}"
+    
+    def get_total(self):
+        """Calcula o total do carrinho"""
+        total = sum(item.get_subtotal() for item in self.itens.all())
+        return total
+    
+    def get_quantidade_itens(self):
+        """Retorna a quantidade total de itens no carrinho"""
+        return sum(item.quantidade for item in self.itens.all())
+
+
+class ItemCarrinho(models.Model):
+    """
+    Model para itens individuais dentro do carrinho.
+    """
+    carrinho = models.ForeignKey(Carrinho, on_delete=models.CASCADE, related_name='itens')
     produto = models.ForeignKey(Produtos, on_delete=models.CASCADE)
+    quantidade = models.PositiveIntegerField(default=1)
+    preco_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    data_adicao = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'ItemCarrinho'
+        verbose_name = 'Item do Carrinho'
+        verbose_name_plural = 'Itens do Carrinho'
+        unique_together = ['carrinho', 'produto']
+    
+    def __str__(self):
+        return f"{self.quantidade}x {self.produto.nome}"
+    
+    def get_subtotal(self):
+        """Calcula o subtotal do item"""
+        return self.quantidade * self.preco_unitario
+
+
+class Pedido(models.Model):
+    """
+    Model para gerenciar pedidos/compras realizadas.
+    """
+    STATUS_CHOICES = [
     quantidade = models.PositiveIntegerField(default=1)
     preco_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     data_adicao = models.DateTimeField(auto_now_add=True)

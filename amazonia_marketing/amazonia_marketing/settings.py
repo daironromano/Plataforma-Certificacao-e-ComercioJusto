@@ -63,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # Middleware do allauth
+    'allauth.account.middleware.AccountMiddleware',  # Middleware do allauth
 ]
 
 ROOT_URLCONF = 'amazonia_marketing.urls'
@@ -92,11 +93,16 @@ WSGI_APPLICATION = 'amazonia_marketing.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Engine padrão do Django para MySQL
+        'ENGINE': 'django.db.backends.mysql',  # Engine padrão do Django para MySQL
         'NAME': 'amazonia_marketing',          # Nome exato do banco que criamos
         'USER': 'django_user',                 # Seu usuário do MySQL
         'PASSWORD': 'django123',               # Senha
         'HOST': '127.0.0.1',                   # Localhost
         'PORT': '3306',                        # Porta padrão
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+        },
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',

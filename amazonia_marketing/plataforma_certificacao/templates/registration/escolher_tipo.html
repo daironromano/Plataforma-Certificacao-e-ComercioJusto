@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 50px auto; text-align: center;">
+    <h1 style="margin-bottom: 30px;">Bem-vindo à Plataforma Amazônia Marketing</h1>
+    <h2 style="margin-bottom: 40px;">Como você deseja se cadastrar?</h2>
+    
+    <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
+        <!-- Card Produtor -->
+        <div style="border: 2px solid #28a745; border-radius: 10px; padding: 30px; width: 250px; cursor: pointer; transition: transform 0.3s;" 
+             onclick="window.location.href='{% url 'cadastro_produtor' %}'">
+            <div style="font-size: 60px; margin-bottom: 20px;">🌱</div>
+            <h3 style="color: #28a745; margin-bottom: 15px;">Sou Produtor</h3>
+            <p style="color: #666;">Produzo e vendo produtos da Amazônia</p>
+            <a href="{% url 'cadastro_produtor' %}" class="btn btn-success" style="margin-top: 20px; display: inline-block; padding: 10px 30px; text-decoration: none; border-radius: 5px;">
+                Cadastrar como Produtor
+            </a>
+        </div>
+        
+        <!-- Card Empresa -->
+        <div style="border: 2px solid #007bff; border-radius: 10px; padding: 30px; width: 250px; cursor: pointer; transition: transform 0.3s;" 
+             onclick="window.location.href='{% url 'cadastro_empresa' %}'">
+            <div style="font-size: 60px; margin-bottom: 20px;">🏢</div>
+            <h3 style="color: #007bff; margin-bottom: 15px;">Sou Empresa</h3>
+            <p style="color: #666;">Compro produtos de produtores</p>
+            <a href="{% url 'cadastro_empresa' %}" class="btn btn-primary" style="margin-top: 20px; display: inline-block; padding: 10px 30px; text-decoration: none; border-radius: 5px;">
+                Cadastrar como Empresa
+            </a>
+        </div>
+    </div>
+    
+    <div style="margin-top: 40px;">
+        <p style="color: #666;">Já tem uma conta? 
+            <a href="{% url 'login' %}" style="color: #007bff; text-decoration: none; font-weight: bold;">Faça login aqui</a>
+        </p>
+    </div>
+</div>
+
+<style>
+    div[onclick]:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}

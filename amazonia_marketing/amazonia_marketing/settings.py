@@ -71,7 +71,6 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',  # Middleware do allauth
     'plataforma_certificacao.middleware.RedirecionamentoPorTipoMiddleware',  # Redirecionamento inteligente
     'plataforma_certificacao.middleware.ValidacaoTipoUsuarioMiddleware',  # Validação de tipo
-    'allauth.socialaccount.middleware.SocialAccountMiddleware',  # Middleware do allauth social
 ]
 
 ROOT_URLCONF = 'amazonia_marketing.urls'

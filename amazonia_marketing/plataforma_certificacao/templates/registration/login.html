@@ -222,30 +222,26 @@
 </head>
 <body>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/variables.css' %}">
-    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
-</head>
-<body class="auth-page">
+
     <canvas id="canvas-bg"></canvas>
 
-    <div class="auth-container">
-        <!-- Header com Logo e Nome -->
-        <div class="auth-header">
-            <div class="brand-row">
-                <div class="logo-icon">
-                    <img src="{% static 'logo_solta.png' %}" alt="Logo Amazônia Marketing">
-                </div>
-                <div class="brand-name">Amazônia<br>Marketing</div>
-            </div>
+    <div class="container-login">
+
+        <div class="header-marca">
+         {% load static %}   <img src="{% static 'nome.png' %}" alt="Amazônia Marketing">
         </div>
 
-        <!-- Formulário de Login -->
-        <form method="post" class="auth-form">
+        <div id="img_solo">
+          {% load static %}  <img src="{% static 'logo_solta.png' %}"  alt="Logo">
+        </div>
+
+        <form method="post" action = "{% url 'login' %}">
+
             {% csrf_token %}
 
-            <!-- Título do Formulário -->
-            <div class="form-title">
+            <div class="titulo">
                 <h1>Login</h1>
+                <div class="barra_horizontal"></div>
             </div>
 
             {% if messages %}
@@ -261,24 +257,14 @@
                 <input type="text" name="username" required>
             </div>
 
-            <!-- Campo Senha -->
-            <div class="form-group">
-                <label for="senha">
-                    <span>🔐</span> Senha
-                </label>
-                <input 
-                    type="password" 
-                    id="senha"
-                    name="senha" 
-                    placeholder="Digite sua senha"
-                    required
-                    autocomplete="current-password">
-            </div>
+            <div class="campo_input">
+                <label>Senha:</label>
+                <input type="password" name="password" required>
+            </div> 
 
-            <!-- Checkbox Lembrar-me -->
-            <div class="form-checkbox">
-                <input type="checkbox" id="remember" name="remember">
-                <label for="remember">Lembrar-me neste dispositivo</label>
+            <div class="lembrar-me">
+                <input type="checkbox" id="check">
+                <label for="check">Lembrar-me</label>
             </div>
 
             <button type="submit">Entrar</button>
@@ -310,79 +296,6 @@
         </form>
     </div>
 
-    <script>
-        // Canvas Background Animation
-        const canvas = document.getElementById('canvas-bg');
-        const ctx = canvas.getContext('2d');
-        
-        // Responsive Canvas
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        // Particle Animation
-        const particles = [];
-        const particleCount = 50;
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 3 + 1;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * 0.5 - 0.25;
-                this.opacity = Math.random() * 0.5 + 0.2;
-            }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-
-                if (this.x > canvas.width) this.x = 0;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0;
-                if (this.y < 0) this.y = canvas.height;
-            }
-
-            draw() {
-                ctx.fillStyle = `rgba(218, 187, 44, ${this.opacity})`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        // Initialize particles
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
-
-        // Animation loop
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            particles.forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
-
-            requestAnimationFrame(animate);
-        }
-
-        animate();
-
-        // Form Validation
-        const form = document.querySelector('.auth-form');
-        const emailInput = document.getElementById('email');
-        const senhaInput = document.getElementById('senha');
-
-        form.addEventListener('submit', function(e) {
-            // Remove leading/trailing spaces
-            emailInput.value = emailInput.value.trim();
-        });
-    </script>
+    
 </body>
 </html>

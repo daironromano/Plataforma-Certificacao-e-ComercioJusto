@@ -1,22 +1,7 @@
-# Ambiente virtual
-venv/
-.env/
-env/
-.venv/
-
-# Cache Python
+﻿venv/
+.env
+.env.local
 __pycache__/
 *.pyc
-
-# Django
 db.sqlite3
-*.log
 media/
-
-# VS Code
-.vscode/
-.history/
-
-# Sistema
-.DS_Store
-Thumbs.db

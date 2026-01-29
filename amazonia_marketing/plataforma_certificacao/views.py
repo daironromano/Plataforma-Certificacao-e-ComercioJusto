@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login as auth_login, logout as auth_logout
-from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 # Importamos as classes que criamos no models.py
@@ -252,7 +250,7 @@ def cadastro_usuario(request):
         return redirecionar_por_tipo(request.user)
     
     if request.method == 'POST':
-        form = CadastroEmpresaForm(request.POST)
+        form = CadastroUsuarioForm(request.POST)
         if form.is_valid():
             # O método save() que criamos no forms.py faz toda a mágica do banco
             user = form.save()
@@ -264,9 +262,9 @@ def cadastro_usuario(request):
         else:
             messages.error(request, 'Erro no cadastro. Verifique os campos.')
     else:
-        form = CadastroEmpresaForm()
-    
-    return render(request, 'registration/cadastro_empresa.html', {'form': form})
+        form = CadastroUsuarioForm()
+        
+    return render(request, 'registration/cadastro.html', {'form': form})
 
 def escolher_tipo_cadastro(request):
     """
@@ -524,7 +522,6 @@ def enviar_autodeclaracao(request):
     produtos_usuario = Produtos.objects.filter(usuario=request.user)
     
     # PROTEÇÃO CONTRA IDOR: Filtra APENAS produtos do produtor logado
-    # PROTEÇÃO CONTRA IDOR: Filtra APENAS produtos do produtor logado
     if request.method == 'POST':
         # Obter o ID do produto selecionado
         produto_id = request.POST.get('produto_id')
@@ -632,9 +629,12 @@ def deletar_produto(request, produto_id):
     # Agora é seguro apagar o pai
     nome_produto = produto.nome 
     produto.delete()
-    messages.success(request, f'Produto "{nome_produto}" removido com sucesso!')
+    messages.success(request, f'Produto: {nome_produto} removido!')   
     return redirect('home_produtor')
 
+# ==============================================================================
+# 3. ÁREA DA EMPRESA
+# ==============================================================================
 
 # --- DASHBOARD DA EMPRESA ---
 @user_is_empresa

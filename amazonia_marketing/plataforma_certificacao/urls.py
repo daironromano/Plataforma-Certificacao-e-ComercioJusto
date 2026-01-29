@@ -8,22 +8,13 @@ urlpatterns = [
     path('', views.home_publica, name='home_publica'), # Tela inicial pública
     
     # Rotas de Autenticação e Cadastro
-    path('', views.home_publica, name='home_publica'), # Tela inicial pública
-    
-    # Rotas de Autenticação e Cadastro
     path('registration/login/', views.login_usuarios, name='login'),
     path('registration/escolher-tipo/', views.escolher_tipo_cadastro, name='escolher_tipo_cadastro'),
     path('registration/escolher-tipo-google/', views.escolher_tipo_apos_google, name='escolher_tipo_google'),
     path('registration/cadastro-produtor/', views.cadastro_produtor, name='cadastro_produtor'),
     path('registration/cadastro-empresa/', views.cadastro_empresa, name='cadastro_empresa'),
     path('logout/', views.logout_view, name='logout'),
-    path('registration/escolher-tipo/', views.escolher_tipo_cadastro, name='escolher_tipo_cadastro'),
-    path('registration/escolher-tipo-google/', views.escolher_tipo_apos_google, name='escolher_tipo_google'),
-    path('registration/cadastro-produtor/', views.cadastro_produtor, name='cadastro_produtor'),
-    path('registration/cadastro-empresa/', views.cadastro_empresa, name='cadastro_empresa'),
-    path('logout/', views.logout_view, name='logout'),
     
-    # Rotas protegidas por tipo de usuário
     # Rotas protegidas por tipo de usuário
     path('produtor/dashboard/', views.home_produtor, name='home_produtor'),
     path('empresa/dashboard/', views.home_empresa, name='home_empresa'),
@@ -32,7 +23,6 @@ urlpatterns = [
     # Rotas de funcionalidades do Produtor
     path('cadastro_produto/', views.cadastro_produto, name='cadastro_produto'),
     path('produtor/certificado/', views.enviar_autodeclaracao, name='enviar_autodeclaracao'),
-    path('produtor/certificado-multiplo/', views.enviar_autodeclaracao_multipla, name='enviar_autodeclaracao_multipla'),
     path('produtor/certificado-multiplo/', views.enviar_autodeclaracao_multipla, name='enviar_autodeclaracao_multipla'),
     path('produtor/deletar/<int:produto_id>', views.deletar_produto, name='deletar_produto'),
     path('produtor/configuracoes/', views.config_perfil_produtor, name='config_perfil_produtor'),

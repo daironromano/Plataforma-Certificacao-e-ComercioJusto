@@ -23,9 +23,11 @@ urlpatterns = [
     # Incluir todas as URLs do app plataforma_certificacao
     path('', include('plataforma_certificacao.urls')),
     
+    # URLs de pagamentos (Stripe)
+    path('pagamentos/', include('payments.urls')),
+    
     # Django Admin (deve vir por último)
     path('admin/', admin.site.urls),
-    path('', include('plataforma_certificacao.urls')),
     
     # URLs do django-allauth (login social)
     path('accounts/', include('allauth.urls')),

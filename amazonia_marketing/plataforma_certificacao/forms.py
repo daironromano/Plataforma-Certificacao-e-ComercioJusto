@@ -1,33 +1,16 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from .models import (
-    Produtos, Produtor, EmpresaProdutor, Certificacoes, Empresa, CustomUser
+    Produtos, ProdutorProfile, EmpresaProfile, Certificacoes, UsuarioBase
 )
-from django.contrib.auth.models import User
 import re
 
 # ============================================================================
 # FORMS DE AUTENTICAÇÃO E CADASTRO
 # ============================================================================
 
-class CadastroProdutorForm(forms.Form):
+class CadastroProdutorForm(forms.ModelForm):
     """Formulário para cadastro de novo produtor"""
-    email = forms.EmailField(
-        max_length=100,
-        widget=forms.EmailInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'seu@email.com',
-            'required': True
-        })
-    )
-    nome = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'Nome Completo',
-            'required': True
-        })
-    )
     cpf = forms.CharField(
         max_length=14,
         required=False,
@@ -35,22 +18,6 @@ class CadastroProdutorForm(forms.Form):
             'class': 'form-input',
             'placeholder': '000.000.000-00',
             'id': 'id_cpf'
-        })
-    )
-    telefone = forms.CharField(
-        max_length=20,
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': '(00) 9999-9999'
-        })
-    )
-    endereco = forms.CharField(
-        max_length=255,
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'Endereço completo'
         })
     )
     senha = forms.CharField(
@@ -68,9 +35,33 @@ class CadastroProdutorForm(forms.Form):
         })
     )
 
+    class Meta:
+        model = UsuarioBase
+        fields = ['email', 'nome', 'telefone', 'endereco']
+        widgets = {
+            'email': forms.EmailInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'seu@email.com',
+                'required': True
+            }),
+            'nome': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Nome Completo',
+                'required': True
+            }),
+            'telefone': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': '(00) 9999-9999'
+            }),
+            'endereco': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Endereço completo'
+            }),
+        }
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if CustomUser.objects.filter(email=email).exists():
+        if UsuarioBase.objects.filter(email=email).exists():
             raise ValidationError('E-mail já está em uso, tente outro.')
         return email
 
@@ -81,7 +72,7 @@ class CadastroProdutorForm(forms.Form):
             if len(cpf_numeros) != 11:
                 raise ValidationError('CPF deve conter 11 dígitos.')
             # Validar se CPF já existe
-            if Produtor.objects.filter(cpf=cpf_numeros).exists():
+            if ProdutorProfile.objects.filter(cpf=cpf_numeros).exists():
                 raise ValidationError('CPF já está em uso, tente outro.')
         return cpf
 
@@ -96,8 +87,8 @@ class CadastroProdutorForm(forms.Form):
         return cleaned_data
 
     def save(self):
-        """Cria CustomUser com tipo='produtor' e Produtor profile"""
-        user = CustomUser.objects.create_user(
+        """Cria UsuarioBase com tipo='produtor' e ProdutorProfile"""
+        user = UsuarioBase.objects.create_user(
             email=self.cleaned_data['email'],
             password=self.cleaned_data['senha'],
             nome=self.cleaned_data['nome'],
@@ -107,7 +98,7 @@ class CadastroProdutorForm(forms.Form):
         )
         
         cpf = self.cleaned_data.get('cpf', '').strip()
-        Produtor.objects.create(
+        ProdutorProfile.objects.create(
             usuario=user,
             cpf=cpf if cpf else None
         )
@@ -115,16 +106,8 @@ class CadastroProdutorForm(forms.Form):
         return user
 
 
-class CadastroEmpresaForm(forms.Form):
+class CadastroEmpresaForm(forms.ModelForm):
     """Formulário para cadastro de nova empresa"""
-    email = forms.EmailField(
-        max_length=100,
-        widget=forms.EmailInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'seu@empresa.com',
-            'required': True
-        })
-    )
     nome = forms.CharField(
         max_length=100,
         label='Nome de Contato',
@@ -151,22 +134,6 @@ class CadastroEmpresaForm(forms.Form):
             'placeholder': 'Razão Social da Empresa'
         })
     )
-    telefone = forms.CharField(
-        max_length=20,
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': '(00) 9999-9999'
-        })
-    )
-    endereco = forms.CharField(
-        max_length=255,
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'Endereço comercial'
-        })
-    )
     senha = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'form-input',
@@ -182,9 +149,33 @@ class CadastroEmpresaForm(forms.Form):
         })
     )
 
+    class Meta:
+        model = UsuarioBase
+        fields = ['email', 'nome', 'telefone', 'endereco']
+        widgets = {
+            'email': forms.EmailInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'seu@empresa.com',
+                'required': True
+            }),
+            'nome': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Nome da Pessoa de Contato',
+                'required': True
+            }),
+            'telefone': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': '(00) 9999-9999'
+            }),
+            'endereco': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Endereço comercial'
+            }),
+        }
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if CustomUser.objects.filter(email=email).exists():
+        if UsuarioBase.objects.filter(email=email).exists():
             raise ValidationError('E-mail já está em uso, tente outro.')
         return email
 
@@ -197,7 +188,7 @@ class CadastroEmpresaForm(forms.Form):
                 raise ValidationError('CNPJ deve conter 14 dígitos.')
             
             # Validar se CNPJ já existe
-            if EmpresaProdutor.objects.filter(cnpj=cnpj_numeros).exists():
+            if EmpresaProfile.objects.filter(cnpj=cnpj_numeros).exists():
                 raise ValidationError('CNPJ já está em uso, tente outro.')
         
         return cnpj
@@ -213,8 +204,8 @@ class CadastroEmpresaForm(forms.Form):
         return cleaned_data
 
     def save(self):
-        """Cria CustomUser com tipo='empresa' e EmpresaProdutor profile"""
-        user = CustomUser.objects.create_user(
+        """Cria UsuarioBase com tipo='empresa' e EmpresaProfile"""
+        user = UsuarioBase.objects.create_user(
             email=self.cleaned_data['email'],
             password=self.cleaned_data['senha'],
             nome=self.cleaned_data['nome'],
@@ -224,7 +215,7 @@ class CadastroEmpresaForm(forms.Form):
         )
         
         cnpj = self.cleaned_data.get('cnpj', '').strip()
-        EmpresaProdutor.objects.create(
+        EmpresaProfile.objects.create(
             usuario=user,
             cnpj=cnpj if cnpj else None,
             razao_social=self.cleaned_data.get('razao_social', '')
@@ -238,9 +229,9 @@ class CadastroEmpresaForm(forms.Form):
 # ============================================================================
 
 class UsuarioBaseConfigForm(forms.ModelForm):
-    """Formulário para edição de dados básicos do usuário (CustomUser)"""
+    """Formulário para edição de dados básicos do usuário (UsuarioBase)"""
     class Meta:
-        model = CustomUser
+        model = UsuarioBase
         fields = ['nome', 'email', 'telefone', 'endereco']
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Nome Completo'}),
@@ -253,7 +244,7 @@ class UsuarioBaseConfigForm(forms.ModelForm):
 class ProdutorConfigForm(forms.ModelForm):
     """Formulário para edição de perfil do produtor"""
     class Meta:
-        model = Produtor
+        model = ProdutorProfile
         fields = ['cpf', 'bio', 'foto_perfil', 'cidade', 'estado', 'cep', 'whatsapp', 'instagram', 'facebook']
         widgets = {
             'cpf': forms.TextInput(attrs={'class': 'form-input', 'placeholder': '000.000.000-00'}),
@@ -271,7 +262,7 @@ class ProdutorConfigForm(forms.ModelForm):
 class EmpresaConfigForm(forms.ModelForm):
     """Formulário para edição de perfil da empresa"""
     class Meta:
-        model = EmpresaProdutor
+        model = EmpresaProfile
         fields = ['cnpj', 'razao_social', 'nome_fantasia', 'inscricao_estadual', 
                   'documento_contrato_social', 'documento_cnpj', 'documento_alvara',
                   'endereco_comercial', 'cidade', 'estado', 'cep', 'telefone_comercial', 'site']
@@ -318,7 +309,7 @@ class ProdutoForm(forms.ModelForm):
 class EditarPerfilProdutorForm(forms.ModelForm):
     """Formulário para edição de perfil do produtor"""
     class Meta:
-        model = Produtor
+        model = ProdutorProfile
         fields = ['bio', 'foto_perfil', 'cidade', 'estado', 'cep', 'whatsapp', 'instagram', 'facebook']
         widgets = {
             'bio': forms.Textarea(attrs={'class': 'form-input', 'rows': 5, 'placeholder': 'Conte sua história...'}),
@@ -336,7 +327,7 @@ class EditarPerfilEmpresaForm(forms.ModelForm):
     """Formulário para edição de perfil da empresa com validação obrigatória de documentos"""
     
     class Meta:
-        model = EmpresaProdutor
+        model = EmpresaProfile
         fields = ['cnpj', 'razao_social', 'nome_fantasia', 'inscricao_estadual',
                   'documento_contrato_social', 'documento_cnpj', 'documento_alvara',
                   'endereco_comercial', 'cidade', 'estado', 'cep', 'telefone_comercial', 'site', 'logo', 'descricao_empresa']
@@ -417,31 +408,46 @@ class CertificacaoForm(forms.ModelForm):
         }
 
 
-class CertificacaoMultiplaForm(forms.Form):
-    """Formulário para submissão de certificação em múltiplos produtos"""
-    texto_autodeclaracao = forms.CharField(
-        label='Autodeclaração',
-        widget=forms.Textarea(attrs={
-            'class': 'form-input',
-            'rows': 6,
-            'placeholder': 'Declare os critérios que seus produtos atendem...'
-        })
-    )
-    arquivo_autodeclaracao = forms.FileField(
-        label='Documento de Suporte (PDF ou Imagem)',
-        required=False,
-        widget=forms.FileInput(attrs={
-            'class': 'form-input',
-            'accept': '.pdf,.doc,.docx,.jpg,.png'
-        })
-    )
-    produtos = forms.ModelMultipleChoiceField(
-        label='Selecione os Produtos',
+class CertificacaoMultiplaForm(forms.ModelForm):
+    """Formulário para submissão de certificação (produto único)"""
+    produto = forms.ModelChoiceField(
+        label='Selecione o Produto',
         queryset=Produtos.objects.none(),
-        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-checkbox'})
+        widget=forms.Select(attrs={'class': 'form-input'})
     )
+
+    class Meta:
+        model = Certificacoes
+        fields = ['produto', 'texto_autodeclaracao', 'documento', 'documento_2', 'documento_3']
+        widgets = {
+            'texto_autodeclaracao': forms.Textarea(attrs={
+                'class': 'form-input',
+                'rows': 6,
+                'placeholder': 'Declare os critérios que seus produtos atendem...'
+            }),
+            'documento': forms.FileInput(attrs={
+                'class': 'form-input',
+                'accept': '.pdf,.doc,.docx,.jpg,.png'
+            }),
+            'documento_2': forms.FileInput(attrs={
+                'class': 'form-input',
+                'accept': '.pdf,.doc,.docx,.jpg,.png'
+            }),
+            'documento_3': forms.FileInput(attrs={
+                'class': 'form-input',
+                'accept': '.pdf,.doc,.docx,.jpg,.png'
+            }),
+        }
 
     def __init__(self, usuario=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if usuario:
-            self.fields['produtos'].queryset = Produtos.objects.filter(usuario=usuario, status_estoque='disponivel')
+            self.fields['produto'].queryset = Produtos.objects.filter(usuario=usuario, status_estoque='disponivel')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        for campo in ['documento', 'documento_2', 'documento_3']:
+            arquivo = cleaned_data.get(campo)
+            if arquivo and arquivo.size > 5 * 1024 * 1024:
+                self.add_error(campo, 'Arquivo muito grande. Máximo 5MB permitido.')
+        return cleaned_data

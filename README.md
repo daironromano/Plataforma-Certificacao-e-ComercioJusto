@@ -5,7 +5,6 @@ Este repositório contém o desenvolvimento do Projeto Integrador I, cujo objeti
 ## Cliente
 **Amazônia Marketing & Consultoria Ltda.**
 
-
 ## O Problema
 O processo atual de **cadastramento e certificação** não conversa com o mercado.  
 Isso gera:

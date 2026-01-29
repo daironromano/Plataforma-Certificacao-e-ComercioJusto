@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [   
     path('', views.home_publica, name='home_publica'), # Tela inicial pública
+    path('home/', views.home_publica, name='home'),
     
     # Rotas de Autenticação e Cadastro
     path('registration/login/', views.login_usuarios, name='login'),

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pagamento - Amazônia Marketing{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 3rem auto; padding: 0 1rem;">
+    
+    <div style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h1 style="margin: 0 0 0.5rem 0; font-size: 1.8rem;">Processando Pagamento</h1>
+        <p style="margin: 0; opacity: 0.9;">Você está sendo redirecionado para o gateway de pagamento seguro</p>
+    </div>
+
+    <div style="background: white; padding: 3rem 2rem; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="margin-bottom: 2rem;">
+            <div style="width: 50px; height: 50px; border: 5px solid #27ae60; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+        </div>
+        
+        <h2 style="color: #2c3e50; margin: 0 0 1rem 0;">Aguarde um momento...</h2>
+        <p style="color: #7f8c8d; margin: 0 0 2rem 0;">Você será redirecionado para o Stripe em breve.</p>
+        
+        <div style="padding: 1.5rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 2rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: left;">
+                <div>
+                    <span style="color: #7f8c8d; font-size: 0.9rem;">Pedido:</span>
+                    <div style="color: #2c3e50; font-weight: 600;">#{{ pedido.pk }}</div>
+                </div>
+                <div>
+                    <span style="color: #7f8c8d; font-size: 0.9rem;">Valor:</span>
+                    <div style="color: #27ae60; font-weight: 600;">R$ {{ pedido.total|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <p style="color: #95a5a6; font-size: 0.9rem;">
+            Se não for redirecionado automaticamente, <a href="{{ stripe_url }}" style="color: #27ae60; text-decoration: none; font-weight: 600;">clique aqui</a>.
+        </p>
+    </div>
+
+</div>
+
+<style>
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    // Redirecionar automaticamente se não estiver já redirecionando
+    window.addEventListener('load', function() {
+        if (window.location.href.indexOf('stripe.com') === -1) {
+            // Poderia redirecionar aqui se necessário
+        }
+    });
+</script>
+{% endblock %}

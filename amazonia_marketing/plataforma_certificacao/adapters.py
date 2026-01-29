@@ -1,6 +1,6 @@
 """
 Adapters customizados para django-allauth.
-Mapeiam dados do Google OAuth para o modelo CustomUser.
+Mapeiam dados do Google OAuth para o modelo UsuarioBase.
 """
 
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter, get_adapter
@@ -10,7 +10,28 @@ from allauth.account.utils import perform_login
 from allauth.exceptions import ImmediateHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from .models import CustomUser, Produtor, EmpresaProdutor
+from .models import UsuarioBase, ProdutorProfile, EmpresaProfile
+
+
+def normalize_tipo(tipo_input):
+    """
+    Normaliza o tipo de usuário para minúsculas.
+    Valida se está entre as opções permitidas.
+    
+    Aceita: "produtor", "PRODUTOR", "Produtor", "PrOdUtoR", etc.
+    Retorna: "produtor" (minúsculas) ou None se inválido
+    """
+    if not tipo_input:
+        return None
+    
+    tipos_validos = ['produtor', 'empresa', 'admin']
+    tipo_normalizado = str(tipo_input).strip().lower()
+    
+    # Validar se é uma opção válida
+    if tipo_normalizado not in tipos_validos:
+        return None
+    
+    return tipo_normalizado
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -38,13 +59,13 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         
         # Verifica se já existe um usuário Django com esse email
         try:
-            user = CustomUser.objects.get(email__iexact=email)
+            user = UsuarioBase.objects.get(email__iexact=email)
             # Encontrou! Conecta a conta social ao usuário existente
             # Isso permite que um usuário que se cadastrou manualmente
             # possa fazer login com Google depois
             sociallogin.connect(request, user)
             raise ImmediateHttpResponse(redirect(self.get_login_redirect_url(request)))
-        except CustomUser.DoesNotExist:
+        except UsuarioBase.DoesNotExist:
             # Usuário novo - se ele ainda não escolheu o tipo, pausamos o fluxo
             if not request.session.get('tipo_usuario_social'):
                 # Guarda dados mínimos para mostrar na tela de escolha
@@ -79,18 +100,19 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def save_user(self, request, sociallogin, form=None):
         """
         Salva o usuário após login social.
-        Aqui criamos o CustomUser e perfis específicos com dados do Google.
+        Aqui criamos o UsuarioBase e perfis específicos com dados do Google.
         """
         # Pega dados do Google
         google_data = sociallogin.account.extra_data
         email = google_data.get('email')
         nome = google_data.get('name', email.split('@')[0])  # Usa parte antes do @ se não tiver nome
         
-        # Verifica se o usuário já escolheu o tipo
+        # Verifica se o usuário já escolheu o tipo e normaliza
         tipo = request.session.get('tipo_usuario_social', None)
+        tipo_normalizado = normalize_tipo(tipo)
         
-        if not tipo:
-            # Segurança extra: se chegou aqui sem tipo, pausa e volta para escolha
+        if not tipo_normalizado:
+            # Segurança extra: se chegou aqui sem tipo válido, pausa e volta para escolha
             request.session['google_data'] = {
                 'email': email,
                 'nome': nome,
@@ -98,21 +120,21 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             }
             raise ImmediateHttpResponse(redirect(reverse('escolher_tipo_google')))
         
-        # Chama a implementação padrão do save_user que cria o CustomUser
+        # Chama a implementação padrão do save_user que cria o UsuarioBase
         # Este método já foi populado pelo populate_user
         user = super().save_user(request, sociallogin, form)
         
         # IMPORTANTE: user já foi salvo pela super().save_user()
-        # Atualizar o tipo de usuário no CustomUser
-        user.tipo = tipo.lower()
+        # Atualizar o tipo de usuário no UsuarioBase com valor normalizado
+        user.tipo = tipo_normalizado
         user.nome = nome
         user.save()
         
         # Se foi criado novo, cria o perfil específico (Produtor ou Empresa)
-        if tipo.lower() == 'produtor':
-            Produtor.objects.get_or_create(usuario=user)
-        elif tipo.lower() == 'empresa':
-            EmpresaProdutor.objects.get_or_create(usuario=user)
+        if tipo_normalizado == 'produtor':
+            ProdutorProfile.objects.get_or_create(usuario=user)
+        elif tipo_normalizado == 'empresa':
+            EmpresaProfile.objects.get_or_create(usuario=user)
         
         # Limpa dados da sessão
         if 'tipo_usuario_social' in request.session:

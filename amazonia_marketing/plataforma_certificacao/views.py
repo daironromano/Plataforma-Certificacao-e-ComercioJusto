@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login as auth_login, logout as auth_logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
-# Importamos as classes que criamos no models.py
+from django.views.decorators.csrf import csrf_exempt
+import json
 from .models import (
-    UsuariosLegado, Produtos, Certificacoes, Produtor, Empresa,
-    Carrinho, ItemCarrinho, Pedido, ItemPedido, CustomUser, EmpresaProdutor
+    UsuariosLegado, Produtos, Certificacoes, ProdutorProfile, EmpresaProfile,
+    Carrinho, ItemCarrinho, Pedido, ItemPedido, UsuarioBase
 )
 
 # Importar autenticação do Django e redriecionamento
@@ -29,15 +30,18 @@ from .forms import (
 from datetime import datetime
 # Importar modulo de alerta sucesso ou erro
 from django.contrib import messages
-# Nossos modelos (As tabelas do Banco de Dados)
-from .models import Produtos, Certificacoes, Produtor, EmpresaProdutor
-# Nossos formulários (A validação dos dados que entram)
-from .forms import ProdutoForm, EditarPerfilProdutorForm
 # Utilitários (ferramentas úteis para data e contagem)
 from django.db.models import Count
 # Google OAuth imports
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.helpers import complete_social_login
+
+# Compatibilidade: aliases para os novos nomes de modelos
+Produtor = ProdutorProfile
+EmpresaProdutor = EmpresaProfile
+from allauth.socialaccount.models import SocialApp
+from django.contrib.sites.shortcuts import get_current_site
+from django.db.utils import OperationalError, ProgrammingError
 # Importar decoradores customizados de segurança
 from .decorators import (
     user_is_produtor, 
@@ -52,6 +56,31 @@ from .decorators import (
 import requests
 import re
 from django.utils import timezone
+
+# ==============================================================================
+# HELPER FUNCTIONS - TRATAMENTO CASE-INSENSITIVE
+# ==============================================================================
+
+def normalize_tipo(tipo_input):
+    """
+    Normaliza o tipo de usuário para minúsculas.
+    Valida se está entre as opções permitidas.
+    
+    Aceita: "produtor", "PRODUTOR", "Produtor", "PrOdUtoR", etc.
+    Retorna: "produtor" (minúsculas) ou None se inválido
+    """
+    if not tipo_input:
+        return None
+    
+    tipos_validos = ['produtor', 'empresa', 'admin']
+    tipo_normalizado = str(tipo_input).strip().lower()
+    
+    # Validar se é uma opção válida
+    if tipo_normalizado not in tipos_validos:
+        return None
+    
+    return tipo_normalizado
+
 
 # ==============================================================================
 # 1. ÁREA PÚBLICA E AUTENTICAÇÃO
@@ -76,7 +105,7 @@ def home_publica(request):
             p.tem_selo = False
             
     # Entregamos a lista processada para o template desenhar.
-    return render(request, 'index.html', {'produtos': produtos})
+    return render(request, 'home.html', {'produtos': produtos})
 
 def get_user_tipo(user):
     """
@@ -88,16 +117,43 @@ def get_user_tipo(user):
         return user.tipo
     return None
 
+def is_auditor_user(user):
+    """
+    Valida acesso de Auditor/Admin por tipo, superuser ou group.
+    """
+    if not user.is_authenticated:
+        return False
+    if user.is_superuser:
+        return True
+    if getattr(user, 'tipo', None) == 'admin':
+        return True
+    return user.groups.filter(name__in=['Auditor/Admin', 'Auditor', 'Admin']).exists()
+
 def redirecionar_por_tipo(user):
     """
-    Função auxiliar que decide para onde o usuário vai após login.
-    Baseado no tipo de usuário (produtor, empresa, admin).
-    Centraliza a lógica de redirecionamento.
+    Redirecionamento Inteligente pós-login.
+    Verifica o tipo do usuário e redireciona para o dashboard correto.
+    
+    Fluxo:
+    1. Valida se usuário está autenticado
+    2. Obtém tipo normalizado (minúsculo)
+    3. Redireciona para view específica
+    
+    Rotas:
+    - produtor → /produtor/ (home_produtor)
+    - empresa → /empresa/ (home_empresa)
+    - admin → /admin/home/ (home_admin)
+    - superuser → /admin/ (Django Admin)
+    - fallback → /home/ (página pública)
     """
     if not user.is_authenticated:
         return redirect('login')
     
     tipo = get_user_tipo(user)
+    
+    # Garantir tipo normalizado
+    if tipo:
+        tipo = tipo.lower().strip()
     
     if tipo == 'produtor':
         return redirect('home_produtor')
@@ -108,6 +164,7 @@ def redirecionar_por_tipo(user):
     elif user.is_superuser:
         return redirect('/admin/')
     else:
+        # Fallback: página pública se tipo não estiver definido
         return redirect('home_publica')
 
 def _validar_cnpj_api_interno(cnpj):
@@ -190,8 +247,10 @@ def escolher_tipo_apos_google(request):
 
     if request.method == 'POST':
         tipo = request.POST.get('tipo')
-        if tipo in ['produtor', 'empresa']:
-            request.session['tipo_usuario_social'] = tipo
+        tipo_normalizado = normalize_tipo(tipo)
+        
+        if tipo_normalizado:
+            request.session['tipo_usuario_social'] = tipo_normalizado
 
             # Se temos o sociallogin armazenado, completamos o login
             if sociallogin:
@@ -200,7 +259,7 @@ def escolher_tipo_apos_google(request):
                 return response
             messages.warning(request, 'Sessão expirada. Por favor, tente novamente.')
             return redirect('login')
-        messages.error(request, 'Tipo de usuário inválido.')
+        messages.error(request, 'Tipo de usuário inválido. Use: produtor, empresa ou admin.')
 
     return render(request, 'registration/escolher_tipo_google.html', {
         'nome': google_data.get('nome', 'Usuário'),
@@ -242,7 +301,16 @@ def login_usuarios(request):
             # Feedback visual de erro
             messages.error(request, 'Usuário ou senha inválidos.')
             
-    return render(request, 'registration/login.html')
+    google_login_enabled = False
+    try:
+        site = get_current_site(request)
+        google_login_enabled = SocialApp.objects.filter(provider='google', sites=site).exists()
+    except (OperationalError, ProgrammingError):
+        google_login_enabled = False
+
+    return render(request, 'registration/login.html', {
+        'google_login_enabled': google_login_enabled
+    })
 
 def cadastro_usuario(request):
     # Se o cara já está logado, chuta ele pro painel (não faz sentido cadastrar de novo)
@@ -478,6 +546,8 @@ def cadastro_produto(request):
 
 
 @login_required
+@login_required(login_url='login')
+@user_is_produtor
 def editar_perfil_produtor(request):
     if get_user_tipo(request.user) != 'produtor':
         return redirect('home_publica')
@@ -760,6 +830,7 @@ def home_empresa(request):
 # ==============================================================================
 
 @login_required(login_url='login')
+@user_passes_test(is_auditor_user, login_url='home_publica')
 @user_is_admin
 def home_admin(request):
     """
@@ -809,7 +880,8 @@ def home_admin(request):
     
     return render(request, 'home_admin.html', context)
 
-@login_required
+@login_required(login_url='login')
+@user_passes_test(is_auditor_user, login_url='home_publica')
 @user_is_admin
 def admin_visualizar_certificados(request):
     # Verificação de Permissão
@@ -826,7 +898,9 @@ def admin_visualizar_certificados(request):
     
     return render(request, 'admin_certificacoes.html', {'certificacoes': consulta, 'status_filtro': status_filtro})
 
-@login_required
+@login_required(login_url='login')
+@user_passes_test(is_auditor_user, login_url='home_publica')
+@user_is_admin
 def admin_detalhes_certificacao(request, certificacao_id):
     tipo = get_user_tipo(request.user)
     if tipo != 'admin' and not request.user.is_superuser:
@@ -837,7 +911,9 @@ def admin_detalhes_certificacao(request, certificacao_id):
     
     return render(request, 'admin_detalhes_certificacao.html', {'c': certificacao})
 
-@login_required
+@login_required(login_url='login')
+@user_passes_test(is_auditor_user, login_url='home_publica')
+@user_is_admin
 def admin_responder_certificacoes(request, certificacao_id):
     # Segurança mais um vez.
     tipo = get_user_tipo(request.user)
@@ -965,6 +1041,7 @@ def detalhe_certificacao(request, certificacao_id):
     """
     DetailView para certificação específica.
     Mostra todas as informações detalhadas para análise do auditor.
+    Inclui dados completos do produto e histórico do produtor.
     """
     certificacao = get_object_or_404(Certificacoes, id_certificacao=certificacao_id)
     
@@ -972,10 +1049,24 @@ def detalhe_certificacao(request, certificacao_id):
     produto = certificacao.produto
     produtor = produto.usuario
     
+    # Calcular dados adicionais do produtor
+    total_produtos = Produtos.objects.filter(usuario=produtor).count()
+    certificacoes_pendentes = Certificacoes.objects.filter(
+        produto__usuario=produtor,
+        status_certificacao='pendente'
+    ).count()
+    certificacoes_aprovadas = Certificacoes.objects.filter(
+        produto__usuario=produtor,
+        status_certificacao='aprovado'
+    ).count()
+    
     context = {
         'certificacao': certificacao,
         'produto': produto,
         'produtor': produtor,
+        'total_produtos': total_produtos,
+        'certificacoes_pendentes': certificacoes_pendentes,
+        'certificacoes_aprovadas': certificacoes_aprovadas,
     }
     return render(request, 'admin_detalhe_certificacao.html', context)
 
@@ -1050,13 +1141,12 @@ def enviar_autodeclaracao_multipla(request):
         return redirect('login')
     
     if request.method == 'POST':
-        form = CertificacaoMultiplaForm(request.POST, request.FILES)
-        form.fields['produto'].queryset = Produtos.objects.filter(usuario=usuario)
+        form = CertificacaoMultiplaForm(request.POST, request.FILES, usuario=usuario)
         
         if form.is_valid():
             produto_selecionado = form.cleaned_data['produto']
             texto = form.cleaned_data['texto_autodeclaracao']
-            doc1 = form.cleaned_data.get('documento_1')
+            doc1 = form.cleaned_data.get('documento')
             doc2 = form.cleaned_data.get('documento_2')
             doc3 = form.cleaned_data.get('documento_3')
             
@@ -1074,8 +1164,7 @@ def enviar_autodeclaracao_multipla(request):
             messages.success(request, f'Certificação enviada com sucesso para o produto "{produto_selecionado.nome}"!')
             return redirect('home_produtor')
     else:
-        form = CertificacaoMultiplaForm()
-        form.fields['produto'].queryset = Produtos.objects.filter(usuario=usuario)
+        form = CertificacaoMultiplaForm(usuario=usuario)
     
     context = {
         'form': form,
@@ -1187,18 +1276,21 @@ def ver_carrinho(request):
 
 @login_required(login_url='login')
 @user_is_empresa
+@login_required(login_url='login')
+@user_is_empresa
 def adicionar_ao_carrinho(request, produto_id):
-    """View para adicionar produto ao carrinho (apenas para empresas)"""
-    if request.user.tipo != 'empresa':
-        messages.error(request, 'Apenas empresas podem comprar produtos.')
-        return redirect('home')
-    
+    """
+    View para adicionar produto ao carrinho (apenas para empresas).
+    PROTEÇÃO: @login_required + @user_is_empresa
+    IDOR Prevention: Valida que o carrinho pertence ao usuário logado.
+    """
     produto = get_object_or_404(Produtos, id_produto=produto_id)
     
     if produto.status_estoque != 'disponivel':
         messages.error(request, 'Este produto não está disponível no momento.')
         return redirect('listagem_produtos')
     
+    # Segurança: Carrinho sempre associado ao usuário logado
     carrinho, created = Carrinho.objects.get_or_create(usuario=request.user, ativo=True)
     
     item, created = ItemCarrinho.objects.get_or_create(
@@ -1220,11 +1312,12 @@ def adicionar_ao_carrinho(request, produto_id):
 @login_required(login_url='login')
 @user_is_empresa
 def remover_do_carrinho(request, item_id):
-    """View para remover item do carrinho"""
-    if request.user.tipo != 'empresa':
-        messages.error(request, 'Apenas empresas podem comprar produtos.')
-        return redirect('home')
-    
+    """
+    View para remover item do carrinho.
+    PROTEÇÃO: @login_required + @user_is_empresa
+    IDOR Prevention: Valida que o item pertence ao carrinho do usuário logado.
+    """
+    # IDOR Protection: Filtra apenas itens do carrinho do usuário logado
     item = get_object_or_404(ItemCarrinho, pk=item_id, carrinho__usuario=request.user)
     produto_nome = item.produto.nome
     item.delete()
@@ -1258,20 +1351,20 @@ def atualizar_quantidade_carrinho(request, item_id):
 
 @login_required(login_url='login')
 @user_is_empresa
+@login_required(login_url='login')
+@user_is_empresa
 def checkout(request):
-    """View para página de checkout (apenas para empresas)"""
-    if request.user.tipo != 'empresa':
-        messages.error(request, 'Apenas empresas podem comprar produtos.')
-        return redirect('home')
-    
+    """View para página de checkout"""
     carrinho = get_object_or_404(Carrinho, usuario=request.user, ativo=True)
     itens = carrinho.itens.all().select_related('produto')
     
     if not itens:
         messages.warning(request, 'Seu carrinho está vazio!')
-        return redirect('listagem_produtos')
+        return redirect('home_publica')
     
-    total = carrinho.get_total()
+    subtotal = carrinho.get_total()
+    frete = 0  # Frete grátis para este exemplo
+    total = subtotal + frete
     
     if request.method == 'POST':
         # Validação dos dados de entrega
@@ -1280,9 +1373,8 @@ def checkout(request):
         estado = request.POST.get('estado', '').strip()
         cep = request.POST.get('cep', '').strip()
         telefone = request.POST.get('telefone', '').strip()
-        metodo_pagamento = request.POST.get('metodo_pagamento', '').strip()
         
-        if not all([endereco, cidade, estado, cep, telefone, metodo_pagamento]):
+        if not all([endereco, cidade, estado, cep, telefone]):
             messages.error(request, 'Por favor, preencha todos os campos obrigatórios.')
         else:
             # Criar pedido
@@ -1294,7 +1386,8 @@ def checkout(request):
                 estado_entrega=estado,
                 cep_entrega=cep,
                 telefone_contato=telefone,
-                metodo_pagamento=metodo_pagamento,
+                metodo_pagamento='cartao_credito',
+                status='pendente',
                 observacoes=request.POST.get('observacoes', '')
             )
             
@@ -1312,14 +1405,15 @@ def checkout(request):
             carrinho.ativo = False
             carrinho.save()
             
-            messages.success(request, f'Pedido #{pedido.pk} realizado com sucesso!')
-            return redirect('detalhes_pedido', pedido_id=pedido.pk)
+            # Redirecionar para sessão de pagamento Stripe
+            return redirect('payments:criar_sessao', pedido_id=pedido.pk)
     
     context = {
         'carrinho': carrinho,
         'itens': itens,
+        'subtotal': subtotal,
+        'frete': frete,
         'total': total,
-        'usuario_nome': request.user.nome,
     }
     return render(request, 'checkout.html', context)
 
@@ -1682,12 +1776,15 @@ def detalhe_empresa(request, empresa_id):
 # ==============================================================================
 
 @login_required(login_url='login')
+@login_required(login_url='login')
+@user_is_empresa
 def meus_pedidos(request):
-    """Listar pedidos do usuário logado"""
-    if request.user.tipo != 'empresa':
-        messages.error(request, 'Apenas empresas podem acessar pedidos.')
-        return redirect('home')
-    
+    """
+    Listar pedidos do usuário logado (Empresa).
+    PROTEÇÃO: @login_required + @user_is_empresa
+    IDOR Prevention: Filtra apenas pedidos do usuário logado.
+    """
+    # Segurança: Filtra apenas pedidos do usuário autenticado
     pedidos = Pedido.objects.filter(usuario=request.user).select_related().prefetch_related('itens__produto')
     
     context = {
@@ -1698,13 +1795,17 @@ def meus_pedidos(request):
 
 
 @login_required(login_url='login')
+@user_is_empresa
 def detalhes_pedido(request, pedido_id):
-    """Detalhes de um pedido específico"""
-    if request.user.tipo != 'empresa':
-        messages.error(request, 'Apenas empresas podem acessar pedidos.')
-        return redirect('home')
-    
+    """
+    Detalhes de um pedido específico.
+    PROTEÇÃO: @login_required + @user_is_empresa
+    IDOR Prevention: Valida que o pedido pertence ao usuário logado.
+    """
+    # IDOR Protection: Filtra apenas pedidos do usuário logado
     pedido = get_object_or_404(Pedido, pk=pedido_id, usuario=request.user)
+    
+    # Itens do pedido com dados relacionados
     itens = pedido.itens.all().select_related('produto')
     
     context = {
@@ -1722,7 +1823,12 @@ def detalhes_pedido(request, pedido_id):
 @login_required(login_url='login')
 @user_is_produtor
 def gerar_anuncio_marketplace(request, produto_id):
-    """Gerar anúncio para marketplace externo."""
+    """
+    Gerar anúncio para marketplace externo.
+    PROTEÇÃO: @login_required + @user_is_produtor
+    IDOR Prevention: Valida que o produto pertence ao usuário logado.
+    """
+    # IDOR Protection: Filtra apenas produtos do usuário logado
     produto = get_object_or_404(Produtos, id_produto=produto_id, usuario=request.user)
     
     # Gerar conteúdo básico de anúncio
@@ -1759,6 +1865,8 @@ def meus_anuncios(request):
 
 
 @login_required(login_url='login')
+@user_passes_test(is_auditor_user, login_url='home_publica')
+@user_is_admin
 def admin_responder_certificacao(request, certificacao_id):
     """
     View para admin aprovar/rejeitar uma certificação.

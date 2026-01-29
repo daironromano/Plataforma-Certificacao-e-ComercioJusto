@@ -12,10 +12,15 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env') # Carrega variáveis de ambiente do arquivo .env
 
+# Configuração Stripe
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -44,9 +49,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google', # Provedor Google para django-allauth
     'plataforma_certificacao',
+    'payments.apps.PaymentsConfig',  # Aplicação de pagamentos com Stripe
 ]
 
-AUTHETICATION_BACKENDS = [
+AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend', # Backend padrão do Django
     'allauth.account.auth_backends.AuthenticationBackend', # Backend do allauth
 ]
@@ -63,6 +69,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # Middleware do allauth
+    'plataforma_certificacao.middleware.RedirecionamentoPorTipoMiddleware',  # Redirecionamento inteligente
+    'plataforma_certificacao.middleware.ValidacaoTipoUsuarioMiddleware',  # Validação de tipo
 ]
 
 ROOT_URLCONF = 'amazonia_marketing.urls'
@@ -169,7 +177,7 @@ ALLOWED_UPLOAD_MIME_TYPES = [
 # ============================================
 
 # Modelo de usuário customizado (LOGIN COM EMAIL)
-AUTH_USER_MODEL = 'plataforma_certificacao.CustomUser'
+AUTH_USER_MODEL = 'plataforma_certificacao.UsuarioBase'
 
 # ============================================
 # Configurações do django-allauth
@@ -180,7 +188,7 @@ SITE_ID = 1
 
 # Backends de autenticação
 AUTHENTICATION_BACKENDS = [
-    # Backend padrão do Django (para CustomUser)
+    # Backend padrão do Django (para UsuarioBase)
     'django.contrib.auth.backends.ModelBackend',
     
     # Backend do allauth para social login

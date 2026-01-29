@@ -81,12 +81,12 @@
                 <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #2c3e50;">
                     &#128196; Documento 1 * (Obrigat&oacute;rio)
                 </label>
-                {{ form.documento_1 }}
+                {{ form.documento }}
                 <small style="display: block; color: #7f8c8d; margin-top: 0.5rem;">
-                    {{ form.documento_1.help_text }}
+                    {{ form.documento.help_text }}
                 </small>
-                {% if form.documento_1.errors %}
-                    <span style="color: #e74c3c; font-size: 0.875rem; display: block; margin-top: 0.5rem;">{{ form.documento_1.errors }}</span>
+                {% if form.documento.errors %}
+                    <span style="color: #e74c3c; font-size: 0.875rem; display: block; margin-top: 0.5rem;">{{ form.documento.errors }}</span>
                 {% endif %}
             </div>
 

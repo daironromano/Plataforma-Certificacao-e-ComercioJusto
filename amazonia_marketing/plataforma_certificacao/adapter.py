@@ -48,18 +48,24 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
     def save_user(self, request, sociallogin, form=None):
         """
         Salva ou atualiza o usuário após login social.
-        Aqui podemos customizar como os dados do Google são mapeados para o CustomUser.
+        Aqui podemos customizar como os dados do Google são mapeados para o UsuarioBase.
         """
         user = super().save_user(request, sociallogin, form)
         
-        # Pegar tipo de usuário escolhido na sessão (se houver)
+        # Pegar tipo de usuário escolhido na sessão (se houver) e normalizar
         tipo_usuario = request.session.get('tipo_usuario_social', None)
         
         if tipo_usuario:
-            user.tipo = tipo_usuario
-            user.save()
+            # Normalizar para minúsculas e validar
+            tipo_normalizado = str(tipo_usuario).strip().lower()
+            tipos_validos = ['produtor', 'empresa', 'admin']
+            
+            if tipo_normalizado in tipos_validos:
+                user.tipo = tipo_normalizado
+                user.save()
             # Limpa a sessão após usar
-            del request.session['tipo_usuario_social']
+            if 'tipo_usuario_social' in request.session:
+                del request.session['tipo_usuario_social']
         
         # Mapear dados do Google para campos customizados
         extra_data = sociallogin.account.extra_data

@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import Http404
-from .models import CustomUser, Produtos, Certificacoes
+from .models import UsuarioBase, Produtos, Certificacoes
 from allauth.account.decorators import verified_email_required
 
 @verified_email_required
@@ -52,6 +52,8 @@ def user_is_produtor(view_func):
     """
     Decorador específico para proteger views de Produtor.
     Valida tipo de usuário via CustomUser.tipo
+    
+    Se usuário não for produtor: redireciona para dashboard correto
     """
     @wraps(view_func)
     @login_required(login_url='login')
@@ -60,8 +62,10 @@ def user_is_produtor(view_func):
         if hasattr(request.user, 'tipo') and request.user.tipo == 'produtor':
             return view_func(request, *args, **kwargs)
         else:
-            messages.error(request, 'Acesso negado. Apenas produtores podem acessar esta área.')
-            return redirect('home_publica')
+            # Redireciona para dashboard correto baseado no tipo
+            from .views import redirecionar_por_tipo
+            messages.warning(request, 'Você não tem permissão para acessar essa área.')
+            return redirecionar_por_tipo(request.user)
     
     return wrapper
 
@@ -70,6 +74,8 @@ def user_is_empresa(view_func):
     """
     Decorador específico para proteger views de Empresa.
     Valida tipo de usuário via CustomUser.tipo
+    
+    Se usuário não for empresa: redireciona para dashboard correto
     """
     @wraps(view_func)
     @login_required(login_url='login')
@@ -78,8 +84,10 @@ def user_is_empresa(view_func):
         if hasattr(request.user, 'tipo') and request.user.tipo == 'empresa':
             return view_func(request, *args, **kwargs)
         else:
-            messages.error(request, 'Acesso negado. Apenas empresas podem acessar esta área.')
-            return redirect('home_publica')
+            # Redireciona para dashboard correto baseado no tipo
+            from .views import redirecionar_por_tipo
+            messages.warning(request, 'Você não tem permissão para acessar essa área.')
+            return redirecionar_por_tipo(request.user)
     
     return wrapper
 
@@ -88,6 +96,8 @@ def user_is_admin(view_func):
     """
     Decorador específico para proteger views de Admin/Auditor.
     Valida tipo de usuário via CustomUser.tipo
+    
+    Se usuário não for admin: redireciona para dashboard correto
     """
     @wraps(view_func)
     @login_required(login_url='login')
@@ -98,8 +108,10 @@ def user_is_admin(view_func):
         elif request.user.is_superuser:
             return view_func(request, *args, **kwargs)
         else:
-            messages.error(request, 'Acesso negado. Apenas auditores podem acessar esta área.')
-            return redirect('home_publica')
+            # Redireciona para dashboard correto baseado no tipo
+            from .views import redirecionar_por_tipo
+            messages.warning(request, 'Você não tem permissão para acessar essa área.')
+            return redirecionar_por_tipo(request.user)
     
     return wrapper
 
@@ -127,7 +139,7 @@ def owns_produto(view_func):
             usuario_id = request.session.get('usuario_id')
             if not usuario_id:
                 # Se não tem na sessão, tenta pegar do User model
-                usuario = CustomUser.objects.get(user=request.user)
+                usuario = UsuarioBase.objects.get(user=request.user)
                 usuario_id = usuario.id_usuario
             
             # SEGURANÇA: Filtra pelo dono (IDOR prevention)
@@ -161,7 +173,7 @@ def owns_certificacao(view_func):
             # Obtém o ID do usuário da sessão
             usuario_id = request.session.get('usuario_id')
             if not usuario_id:
-                usuario = CustomUser.objects.get(user=request.user)
+                usuario = UsuarioBase.objects.get(user=request.user)
                 usuario_id = usuario.id_usuario
             
             # SEGURANÇA: Valida se é o admin responsável
@@ -182,21 +194,21 @@ def owns_certificacao(view_func):
 
 def get_usuario_session(request):
     """
-    Função auxiliar para obter o CustomUser a partir da sessão.
+    Função auxiliar para obter o UsuarioBase a partir da sessão.
     Compatível com OAuth e login manual.
     """
     usuario_id = request.session.get('usuario_id')
     if usuario_id:
         try:
-            return CustomUser.objects.get(id_usuario=usuario_id)
-        except CustomUser.DoesNotExist:
+            return UsuarioBase.objects.get(id_usuario=usuario_id)
+        except UsuarioBase.DoesNotExist:
             pass
     
     # Fallback para User model
     if request.user.is_authenticated:
         try:
-            return CustomUser.objects.get(user=request.user)
-        except CustomUser.DoesNotExist:
+            return UsuarioBase.objects.get(user=request.user)
+        except UsuarioBase.DoesNotExist:
             pass
     
     return None

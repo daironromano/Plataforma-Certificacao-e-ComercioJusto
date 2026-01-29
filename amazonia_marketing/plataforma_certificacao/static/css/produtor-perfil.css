@@ -1,0 +1,186 @@
+/* ========================================
+   Configurações do Perfil - Produtor
+   ======================================== */
+
+/* Container Principal */
+.perfil-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* Cabeçalho da Página */
+.perfil-header {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.perfil-header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+}
+
+.perfil-header p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Mensagens de Feedback */
+.perfil-alert {
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 2px solid;
+}
+
+.perfil-alert.alert-success {
+    border-color: #c3e6cb;
+    background: #d4edda;
+}
+
+.perfil-alert.alert-error {
+    border-color: #f5c6cb;
+    background: #f8d7da;
+}
+
+.perfil-alert.alert-info {
+    border-color: #bee5eb;
+    background: #d1ecf1;
+}
+
+/* Preview da Foto de Perfil */
+.perfil-foto-preview {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.perfil-foto-preview img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #2ecc71;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Formulário Principal */
+.perfil-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Seções do Formulário */
+.perfil-section {
+    margin-bottom: 2rem;
+}
+
+.perfil-section-title {
+    color: #2c3e50;
+    border-bottom: 3px solid #2ecc71;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Grid de Campos */
+.perfil-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.perfil-grid-medium {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.perfil-grid-full {
+    grid-column: 1 / -1;
+}
+
+/* Campos de Formulário */
+.perfil-field {
+    margin-bottom: 1.5rem;
+}
+
+.perfil-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #34495e;
+}
+
+.perfil-help-text {
+    color: #7f8c8d;
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.perfil-error {
+    color: #e74c3c;
+    font-size: 0.875rem;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+/* Inputs do Formulário */
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #2ecc71;
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+}
+
+/* Botões de Ação */
+.perfil-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 2px solid #ecf0f1;
+}
+
+.perfil-btn {
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+}
+
+.perfil-btn-cancel {
+    background: #95a5a6;
+    color: white;
+}
+
+.perfil-btn-cancel:hover {
+    background: #7f8c8d;
+}
+
+.perfil-btn-submit {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: white;
+}
+
+.perfil-btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}

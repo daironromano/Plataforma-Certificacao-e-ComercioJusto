@@ -28,7 +28,7 @@
                 <td style="padding: 15px; font-weight: bold;">{{ cert.produto.nome }}</td>
                 
                 <td style="padding: 15px;">
-                    {{ cert.produto.usuario.first_name|default:cert.produto.usuario.username }}
+                    {{ cert.produto.usuario.nome|default:cert.produto.usuario.email }}
                 </td>
                 
                 <td style="padding: 15px;">
@@ -45,7 +45,7 @@
                 
                 <td style="padding: 15px; text-align: center;">
                     {% if cert.status_certificacao == 'pendente' %}
-                        <a href="{% url 'admin_detalhes' cert.id_certificacao %}" 
+                        <a href="{% url 'detalhe_certificacao' cert.id_certificacao %}" 
                            class="btn" 
                            style="background-color: #007bff; color: white; padding: 6px 15px; text-decoration: none; border-radius: 4px; display: inline-block; font-size: 0.9rem;">
                             Analisar

@@ -16,8 +16,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # Incluir todas as URLs do app plataforma_certificacao
     path('', include('plataforma_certificacao.urls')),
+    
+    # URLs de pagamentos (Stripe)
+    path('pagamentos/', include('payments.urls')),
+    
+    # Django Admin (deve vir por último)
+    path('admin/', admin.site.urls),
+    
+    # URLs do django-allauth (login social)
+    path('accounts/', include('allauth.urls')),
 ]
+
+# Configuração de arquivos de media (apenas em desenvolvimento)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

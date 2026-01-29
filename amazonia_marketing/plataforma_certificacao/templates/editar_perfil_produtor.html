@@ -15,8 +15,8 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             <div style="margin-bottom: 15px;">
-                <label><strong>{{ form.first_name.label }}</strong></label>
-                {{ form.first_name }}
+                <label><strong>{{ form.nome.label }}</strong></label>
+                {{ form.nome }}
             </div>
             <div style="margin-bottom: 15px;">
                 <label><strong>{{ form.email.label }}</strong></label>
@@ -25,7 +25,7 @@
         </div>
 
         {% for field in form %}
-            {% if field.name != 'first_name' and field.name != 'email' %}
+            {% if field.name != 'nome' and field.name != 'email' %}
                 <div style="margin-bottom: 20px;">
                     <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">
                         {{ field.label }}

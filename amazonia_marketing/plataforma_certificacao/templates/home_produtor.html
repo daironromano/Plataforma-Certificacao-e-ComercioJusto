@@ -10,7 +10,7 @@
         </div>
         
         <div style="display: flex; gap: 10px;">
-            <a href="{% url 'editar_perfil_produtor' %}" class="btn" style="background-color: #6c757d; color: white; display: flex; align-items: center; gap: 5px; font-weight: 500;">
+            <a href="{% url 'config_perfil_produtor' %}" class="btn" style="background-color: #6c757d; color: white; display: flex; align-items: center; gap: 5px; font-weight: 500;">
                 Meus Dados
             </a>
 
@@ -30,14 +30,19 @@
             <p style="font-size: 2rem; font-weight: bold; margin: 5px 0; color: #333;">{{ total_produtos }}</p>
         </div>
 
-        <div style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid #ffc107;">
+        <div style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid #dabb2c;">
             <h3 style="margin: 0; font-size: 0.9rem; color: #555; text-transform: uppercase;">Auditoria Pendente</h3>
-            <p style="font-size: 2rem; font-weight: bold; margin: 5px 0; color: #333;">{{ pendentes }}</p>
+            <p style="font-size: 2rem; font-weight: bold; margin: 5px 0; color: #333;">{{ certificacoes_pendentes }}</p>
         </div>
 
-        <div style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid #17a2b8;">
+        <div style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid #1C3E1D;">
             <h3 style="margin: 0; font-size: 0.9rem; color: #555; text-transform: uppercase;">Selos Conquistados</h3>
-            <p style="font-size: 2rem; font-weight: bold; margin: 5px 0; color: #333;">{{ aprovados }}</p>
+            <p style="font-size: 2rem; font-weight: bold; margin: 5px 0; color: #333;">{{ certificacoes_aprovadas }}</p>
+        </div>
+
+        <div style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid #6c757d;">
+            <h3 style="margin: 0; font-size: 0.9rem; color: #555; text-transform: uppercase;">Certificações Rejeitadas</h3>
+            <p style="font-size: 2rem; font-weight: bold; margin: 5px 0; color: #333;">{{ certificacoes_rejeitadas }}</p>
         </div>
     </div>
 
@@ -59,37 +64,49 @@
 
                 <div style="padding: 20px;">
                     
-                    <div style="margin-bottom: 10px; font-size: 0.85rem;">
+                    <!-- Status Visual do Produto -->
+                    <div style="margin-bottom: 12px;">
                         {% if p.status_estoque == 'disponivel' %}
-                            <span style="display: inline-flex; align-items: center; gap: 6px; color: #28a745; font-weight: 600; background: #e6f9ec; padding: 4px 10px; border-radius: 20px;">
-                                <span style="width: 8px; height: 8px; background-color: #28a745; border-radius: 50%;"></span>
-                                Disponível
-                            </span>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-left: 4px solid #28a745; border-radius: 6px; box-shadow: 0 2px 4px rgba(40, 167, 69, 0.1);">
+                            <span style="font-size: 1.3rem;">✅</span>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; color: #155724; font-size: 0.9rem; letter-spacing: 0.5px;">EM ESTOQUE</div>
+                                <div style="color: #155724; font-size: 0.75rem; opacity: 0.9;">Produto disponível</div>
+                            </div>
+                        </div>
                         {% elif p.status_estoque == 'esgotado' %}
-                            <span style="display: inline-flex; align-items: center; gap: 6px; color: #dc3545; font-weight: 600; background: #fde8e9; padding: 4px 10px; border-radius: 20px;">
-                                <span style="width: 8px; height: 8px; background-color: #dc3545; border-radius: 50%;"></span>
-                                Esgotado
-                            </span>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-left: 4px solid #dc3545; border-radius: 6px; box-shadow: 0 2px 4px rgba(220, 53, 69, 0.1);">
+                            <span style="font-size: 1.3rem;">❌</span>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; color: #721c24; font-size: 0.9rem; letter-spacing: 0.5px;">ESGOTADO</div>
+                                <div style="color: #721c24; font-size: 0.75rem; opacity: 0.9;">Sem estoque disponível</div>
+                            </div>
+                        </div>
                         {% else %}
-                             <span style="display: inline-flex; align-items: center; gap: 6px; color: #856404; font-weight: 600; background: #fff3cd; padding: 4px 10px; border-radius: 20px;">
-                                <span style="width: 8px; height: 8px; background-color: #ffc107; border-radius: 50%;"></span>
-                                {{ p.status_estoque }}
-                            </span>
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left: 4px solid #ffc107; border-radius: 6px; box-shadow: 0 2px 4px rgba(255, 193, 7, 0.1);">
+                            <span style="font-size: 1.3rem;">⚠️</span>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; color: #856404; font-size: 0.9rem; letter-spacing: 0.5px;">INDEFINIDO</div>
+                                <div style="color: #856404; font-size: 0.75rem; opacity: 0.9;">Atualize o status</div>
+                            </div>
+                        </div>
                         {% endif %}
                     </div>
 
-                    <h3 style="margin: 0 0 5px 0; font-size: 1.1rem; color: #333;">{{ p.nome }}</h3>
-                    <p style="color: #777; font-size: 0.9rem; margin-bottom: 15px;">{{ p.categoria }}</p>
+                    <h3 style="margin: 0 0 8px 0; font-size: 1.15rem; color: #333; font-weight: 600;">{{ p.nome }}</h3>
+                    <p style="color: #777; font-size: 0.9rem; margin-bottom: 15px;">{{ p.categoria|default:"Sem categoria" }}</p>
                     
                     <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #f0f0f0;">
-                        <span style="color: var(--verde-amazonia); font-weight: bold; font-size: 1.3rem;">
-                            R$ {{ p.preco }}
+                        <span style="color: var(--verde-amazonia); font-weight: bold; font-size: 1.35rem;">
+                            R$ {{ p.preco|floatformat:2 }}
                         </span>
+                    </div>
                         
+                    <div style="border-top: 1px solid #eee; padding-top: 10px; text-align: right;">
                         <a href="{% url 'deletar_produto' p.id_produto %}" 
-                           onclick="return confirm('Tem certeza que deseja apagar o produto {{ p.nome }}?');"
-                           style="color: #dc3545; text-decoration: none; font-size: 0.9rem; font-weight: 600; padding: 5px 10px; border-radius: 5px; transition: background 0.2s;">
-                           Excluir
+                           onclick="return confirm('Tem certeza que deseja apagar o produto {{ p.nome }}? Esta ação não pode ser desfeita.');"
+                           style="color: #d9534f; text-decoration: none; font-size: 0.9rem; font-weight: bold;">
+                            Excluir
                         </a>
                     </div>
                 </div>

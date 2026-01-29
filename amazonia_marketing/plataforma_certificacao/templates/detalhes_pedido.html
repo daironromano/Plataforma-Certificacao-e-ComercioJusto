@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pedido #{{ pedido.pk }} - Amazônia Marketing{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pedido.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="pedido-container">
+    
+    <div class="pedido-header">
+        <h1>✅ Pedido Confirmado!</h1>
+        <p>Pedido #{{ pedido.pk }} - {{ pedido.data_pedido|date:"d/m/Y H:i" }}</p>
+    </div>
+
+    <!-- Status do Pedido -->
+    <div class="pedido-card">
+        <h2>Status do Pedido</h2>
+        
+        <div class="status-container {{ pedido.status }}">
+            <span class="status-icon">
+                {% if pedido.status == 'pendente' %}⏳{% elif pedido.status == 'pago' %}✅{% elif pedido.status == 'processando' %}📦{% elif pedido.status == 'enviado' %}🚚{% elif pedido.status == 'entregue' %}🎉{% else %}❌{% endif %}
+            </span>
+            <div>
+                <div class="status-text">{{ pedido.get_status_display }}</div>
+                <div class="status-description">
+                    {% if pedido.status == 'pendente' %}
+                        Aguardando confirmação de pagamento
+                    {% elif pedido.status == 'pago' %}
+                        Pagamento confirmado, pedido em preparação
+                    {% elif pedido.status == 'processando' %}
+                        Pedido sendo preparado para envio
+                    {% elif pedido.status == 'enviado' %}
+                        Pedido enviado e a caminho
+                    {% elif pedido.status == 'entregue' %}
+                        Pedido entregue com sucesso!
+                    {% else %}
+                        Pedido cancelado
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-grid">
+        
+        <!-- Informações de Entrega -->
+        <div class="pedido-card">
+            <h2>📦 Entrega</h2>
+            <div class="info-content">
+                <strong>{{ pedido.usuario.nome }}</strong><br>
+                {{ pedido.endereco_entrega }}<br>
+                {{ pedido.cidade_entrega }} - {{ pedido.estado_entrega }}<br>
+                CEP: {{ pedido.cep_entrega }}<br>
+                Tel: {{ pedido.telefone_contato }}
+            </div>
+        </div>
+        
+        <!-- Informações de Pagamento -->
+        <div class="pedido-card">
+            <h2>💳 Pagamento</h2>
+            <div class="info-content">
+                <strong>Método:</strong> {{ pedido.get_metodo_pagamento_display }}<br>
+                <strong>Total:</strong> <span class="valor-destaque">R$ {{ pedido.total }}</span>
+                {% if pedido.data_pagamento %}
+                <br><strong>Pago em:</strong> {{ pedido.data_pagamento|date:"d/m/Y H:i" }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Itens do Pedido -->
+    <div class="pedido-card">
+        <h2>Itens do Pedido</h2>
+        
+        {% for item in itens %}
+        <div class="item-pedido">
+            <div class="item-imagem">
+                {% if item.produto.imagem %}
+                <img src="{{ item.produto.imagem.url }}" alt="{{ item.produto.nome }}">
+                {% else %}
+                <span>Sem Foto</span>
+                {% endif %}
+            </div>
+            
+            <div class="item-info">
+                <h3>{{ item.produto.nome }}</h3>
+                <p>Quantidade: {{ item.quantidade }}</p>
+            </div>
+            
+            <div class="item-preco">
+                <div class="item-preco-unitario">R$ {{ item.preco_unitario }} x {{ item.quantidade }}</div>
+                <div class="item-subtotal">R$ {{ item.subtotal }}</div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="pedido-total">
+            <div class="pedido-total-row">
+                <span class="pedido-total-label">Total do Pedido:</span>
+                <span class="pedido-total-valor">R$ {{ pedido.total }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="pedido-acoes">
+        <a href="{% url 'meus_pedidos' %}" class="btn-pedido btn-secundario">
+            Ver Todos os Pedidos
+        </a>
+        <a href="{% url 'home_publica' %}" class="btn-pedido btn-primario">
+            Continuar Comprando
+        </a>
+    </div>
+
+</div>
+{% endblock %}

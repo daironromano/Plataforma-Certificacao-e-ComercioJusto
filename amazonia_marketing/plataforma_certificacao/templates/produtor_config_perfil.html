@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurações do Perfil - Produtor{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/produtor-perfil.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="perfil-container">
+    
+    <!-- Cabeçalho da Página -->
+    <div class="perfil-header">
+        <h1>&#9881;&#65039; Configura&ccedil;&otilde;es do Perfil</h1>
+        <p>Complete seu perfil para aumentar sua credibilidade e alcance</p>
+    </div>
+
+    <!-- Mensagens de Feedback -->
+    {% if messages %}
+    {% for message in messages %}
+        <div class="perfil-alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Preview do Perfil -->
+    {% if produtor.foto_perfil %}
+    <div class="perfil-foto-preview">
+        <img src="{{ produtor.foto_perfil.url }}" alt="Foto de Perfil">
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="perfil-form">
+        {% csrf_token %}
+
+        <!-- Seção: Informações Básicas -->
+        <div class="perfil-section">
+            <h2 class="perfil-section-title">
+                &#128203; Informa&ccedil;&otilde;es B&aacute;sicas
+            </h2>
+            
+            <div class="perfil-grid">
+                <div>
+                    <label class="perfil-label">Nome Completo</label>
+                    {{ form_usuario.nome }}
+                    {% if form_usuario.nome.errors %}
+                        <span class="perfil-error">{{ form_usuario.nome.errors }}</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="perfil-label">Email</label>
+                    {{ form_usuario.email }}
+                    {% if form_usuario.email.errors %}
+                        <span class="perfil-error">{{ form_usuario.email.errors }}</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="perfil-label">Telefone</label>
+                    {{ form_usuario.telefone }}
+                    {% if form_usuario.telefone.errors %}
+                        <span class="perfil-error">{{ form_usuario.telefone.errors }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="perfil-grid-full">
+                    <label class="perfil-label">Endereço</label>
+                    {{ form_usuario.endereco }}
+                    {% if form_usuario.endereco.errors %}
+                        <span class="perfil-error">{{ form_usuario.endereco.errors }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção: Biografia e Foto -->
+        <div class="perfil-section">
+            <h2 class="perfil-section-title">
+                ✍️ Sobre Você
+            </h2>
+            
+            <div class="perfil-field">
+                <label class="perfil-label">Biografia</label>
+                {{ form_produtor.bio }}
+                <small class="perfil-help-text">
+                    Conte sua história, sua conexão com a terra e seus valores.
+                </small>
+                {% if form_produtor.bio.errors %}
+                    <span class="perfil-error">{{ form_produtor.bio.errors }}</span>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="perfil-label">Foto de Perfil</label>
+                {{ form_produtor.foto_perfil }}
+                {% if form_produtor.foto_perfil.errors %}
+                    <span class="perfil-error">{{ form_produtor.foto_perfil.errors }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Seção: Localização -->
+        <div class="perfil-section">
+            <h2 class="perfil-section-title">
+                &#128205; Localiza&ccedil;&atilde;o
+            </h2>
+            
+            <div class="perfil-grid-medium">
+                <div>
+                    <label class="perfil-label">Cidade</label>
+                    {{ form_produtor.cidade }}
+                    {% if form_produtor.cidade.errors %}
+                        <span class="perfil-error">{{ form_produtor.cidade.errors }}</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="perfil-label">Estado</label>
+                    {{ form_produtor.estado }}
+                    {% if form_produtor.estado.errors %}
+                        <span class="perfil-error">{{ form_produtor.estado.errors }}</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="perfil-label">CEP</label>
+                    {{ form_produtor.cep }}
+                    {% if form_produtor.cep.errors %}
+                        <span class="perfil-error">{{ form_produtor.cep.errors }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção: Contato e Redes Sociais -->
+        <div class="perfil-section">
+            <h2 class="perfil-section-title">
+                &#128241; Contato e Redes Sociais
+            </h2>
+            
+            <div class="perfil-grid">
+                <div>
+                    <label class="perfil-label">WhatsApp</label>
+                    {{ form_produtor.whatsapp }}
+                    {% if form_produtor.whatsapp.errors %}
+                        <span class="perfil-error">{{ form_produtor.whatsapp.errors }}</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="perfil-label">Instagram</label>
+                    {{ form_produtor.instagram }}
+                    {% if form_produtor.instagram.errors %}
+                        <span class="perfil-error">{{ form_produtor.instagram.errors }}</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="perfil-label">Facebook</label>
+                    {{ form_produtor.facebook }}
+                    {% if form_produtor.facebook.errors %}
+                        <span class="perfil-error">{{ form_produtor.facebook.errors }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="perfil-actions">
+            <a href="{% url 'home_produtor' %}" class="perfil-btn perfil-btn-cancel">
+                Cancelar
+            </a>
+            <button type="submit" class="perfil-btn perfil-btn-submit">
+                &#128190; Salvar Altera&ccedil;&otilde;es
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

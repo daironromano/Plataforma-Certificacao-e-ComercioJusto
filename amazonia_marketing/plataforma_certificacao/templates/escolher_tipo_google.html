@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolher Perfil - Amazônia Marketing</title>
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth-choice.css' %}">
+</head>
+<body class="auth-choice-page">
+    <div class="choice-container">
+        <div class="choice-card">
+            <!-- Perfil do Usuário -->
+            <div class="user-profile">
+                {% if picture %}
+                    <div class="user-avatar">
+                        <img src="{{ picture }}" alt="Foto de perfil do Google">
+                    </div>
+                {% else %}
+                    <div class="user-avatar placeholder">
+                        👤
+                    </div>
+                {% endif %}
+                <div class="user-name">{{ nome }}</div>
+                <div class="user-email">{{ email }}</div>
+            </div>
+
+            <!-- Prompt de Escolha -->
+            <div class="choice-prompt">
+                <p>Como você deseja usar a plataforma?</p>
+            </div>
+
+            <!-- Botões de Escolha -->
+            <form method="POST" class="choice-form">
+                {% csrf_token %}
+                <div class="choice-buttons">
+                    <button type="submit" name="tipo" value="produtor" class="choice-btn produtor">
+                        <div class="choice-btn-icon">🌱</div>
+                        <div class="choice-btn-title">Produtor</div>
+                        <div class="choice-btn-subtitle">Cultivo e vendo produtos</div>
+                    </button>
+                    <button type="submit" name="tipo" value="empresa" class="choice-btn empresa">
+                        <div class="choice-btn-icon">🏢</div>
+                        <div class="choice-btn-title">Empresa</div>
+                        <div class="choice-btn-subtitle">Compro e revendo produtos</div>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Rodapé Informativo -->
+            <div class="choice-footer">
+                <p>Esta informação ajudará a personalizar sua experiência na plataforma</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const buttons = document.querySelectorAll('.choice-btn');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-6px)';
+            });
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

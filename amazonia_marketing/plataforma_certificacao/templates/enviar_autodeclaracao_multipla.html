@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Solicitar Certificação{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; margin: 2rem auto; padding: 0 1rem;">
+    
+    <!-- Cabeçalho -->
+    <div style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h1 style="margin: 0 0 0.5rem 0; font-size: 2rem;">&#127942; Solicitar Certifica&ccedil;&atilde;o</h1>
+        <p style="margin: 0; opacity: 0.9;">Envie até 3 documentos comprobatórios para análise</p>
+    </div>
+
+    <!-- Informações Importantes -->
+    <div style="background: #d1ecf1; border: 2px solid #0c5460; color: #0c5460; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="margin: 0 0 0.5rem 0;">&#8505;&#65039; Informa&ccedil;&otilde;es Importantes</h3>
+        <ul style="margin: 0.5rem 0 0 1.5rem; line-height: 1.8;">
+            <li>Voc&ecirc; pode enviar at&eacute; <strong>3 documentos</strong> por certifica&ccedil;&atilde;o</li>
+            <li>Formatos aceitos: <strong>PDF, DOC, DOCX, JPG, PNG</strong></li>
+            <li>Tamanho máximo por arquivo: <strong>5MB</strong></li>
+            <li>É obrigatório enviar pelo menos <strong>1 documento ou texto</strong></li>
+            <li>Documentos sugeridos: autodeclaração, fotos do processo produtivo, certificados</li>
+        </ul>
+    </div>
+
+    <!-- Mensagens -->
+    {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div class="alert alert-success" style="padding: 1rem; border-radius: 8px; margin-bottom: 1rem; background: #d4edda;">
+                {{ message }}
+            </div>
+        {% elif message.tags == 'error' %}
+            <div class="alert alert-error" style="padding: 1rem; border-radius: 8px; margin-bottom: 1rem; background: #f8d7da;">
+                {{ message }}
+            </div>
+        {% else %}
+            <div class="alert alert-info" style="padding: 1rem; border-radius: 8px; margin-bottom: 1rem; background: #d1ecf1;">
+                {{ message }}
+            </div>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <!-- Formulário -->
+    <form method="post" enctype="multipart/form-data" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        {% csrf_token %}
+
+        <!-- Seleção de Produto -->
+        <div style="margin-bottom: 2rem;">
+            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #2c3e50; font-size: 1.1rem;">
+                📦 Selecione o Produto *
+            </label>
+            {{ form.produto }}
+            {% if form.produto.errors %}
+                <span style="color: #e74c3c; font-size: 0.875rem; display: block; margin-top: 0.5rem;">{{ form.produto.errors }}</span>
+            {% endif %}
+        </div>
+
+        <!-- Texto da Autodeclaração -->
+        <div style="margin-bottom: 2rem;">
+            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #2c3e50; font-size: 1.1rem;">
+                &#9997;&#65039; Texto da Autodeclara&ccedil;&atilde;o
+            </label>
+            {{ form.texto_autodeclaracao }}
+            <small style="display: block; color: #7f8c8d; margin-top: 0.5rem;">
+                Descreva suas práticas sustentáveis, origem dos produtos, processos de produção, etc.
+            </small>
+            {% if form.texto_autodeclaracao.errors %}
+                <span style="color: #e74c3c; font-size: 0.875rem; display: block; margin-top: 0.5rem;">{{ form.texto_autodeclaracao.errors }}</span>
+            {% endif %}
+        </div>
+
+        <!-- Seção de Upload de Documentos -->
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #2ecc71; margin-bottom: 2rem;">
+            <h3 style="margin: 0 0 1.5rem 0; color: #2c3e50;">&#128206; Documentos Comprobat&oacute;rios</h3>
+            
+            <!-- Documento 1 (Obrigatório) -->
+            <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border-radius: 8px; border: 2px dashed #2ecc71;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #2c3e50;">
+                    &#128196; Documento 1 * (Obrigat&oacute;rio)
+                </label>
+                {{ form.documento }}
+                <small style="display: block; color: #7f8c8d; margin-top: 0.5rem;">
+                    {{ form.documento.help_text }}
+                </small>
+                {% if form.documento.errors %}
+                    <span style="color: #e74c3c; font-size: 0.875rem; display: block; margin-top: 0.5rem;">{{ form.documento.errors }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Documento 2 (Opcional) -->
+            <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border-radius: 8px; border: 2px dashed #95a5a6;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #2c3e50;">
+                    &#128196; Documento 2 (Opcional)
+                </label>
+                {{ form.documento_2 }}
+                <small style="display: block; color: #7f8c8d; margin-top: 0.5rem;">
+                    {{ form.documento_2.help_text }}
+                </small>
+                {% if form.documento_2.errors %}
+                    <span style="color: #e74c3c; font-size: 0.875rem; display: block; margin-top: 0.5rem;">{{ form.documento_2.errors }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Documento 3 (Opcional) -->
+            <div style="padding: 1rem; background: white; border-radius: 8px; border: 2px dashed #95a5a6;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #2c3e50;">
+                    &#128196; Documento 3 (Opcional)
+                </label>
+                {{ form.documento_3 }}
+                <small style="display: block; color: #7f8c8d; margin-top: 0.5rem;">
+                    {{ form.documento_3.help_text }}
+                </small>
+                {% if form.documento_3.errors %}
+                    <span style="color: #e74c3c; font-size: 0.875rem; display: block; margin-top: 0.5rem;">{{ form.documento_3.errors }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Erros Gerais do Formulário -->
+        {% if form.non_field_errors %}
+        <div style="background: #f8d7da; border: 2px solid #e74c3c; color: #721c24; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- Botões de Ação -->
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1.5rem; border-top: 2px solid #ecf0f1;">
+            <a href="{% url 'home_produtor' %}" style="padding: 0.75rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 600; background: #95a5a6; color: white; transition: background 0.3s;">
+                Cancelar
+            </a>
+            <button type="submit" style="padding: 0.75rem 2rem; border: none; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; cursor: pointer; transition: transform 0.2s;">
+                &#128640; Enviar Certifica&ccedil;&atilde;o
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-input, select, textarea, input[type="file"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s, box-shadow 0.3s;
+        font-family: inherit;
+    }
+    
+    .form-input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: #2ecc71;
+        box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+    }
+    
+    button[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    }
+    
+    a[href*="home_produtor"]:hover {
+        background: #7f8c8d;
+    }
+    
+    input[type="file"] {
+        padding: 0.5rem;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

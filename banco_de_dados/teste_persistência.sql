@@ -1,10 +1,6 @@
 -- --- INSERÇÃO DE DADOS  ---
 
-<<<<<<< HEAD
--- 1. Inserindo Usuários 
-=======
 -- 1. Inserindo Usuários
->>>>>>> dairon
 -- Usuário 1: Um Produtor Rural (Dona Maria)
 INSERT INTO Usuarios (nome, email, telefone, endereco, senha, tipo, cpf) 
 VALUES ('Maria da Silva', 'maria.produtora@email.com', '91999999999', 'Sítio Esperança, Zona Rural', 'senha123', 'produtor', '12345678900');

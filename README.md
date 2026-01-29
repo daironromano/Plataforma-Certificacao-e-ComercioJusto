@@ -5,7 +5,6 @@ Este repositório contém o desenvolvimento do Projeto Integrador I, cujo objeti
 ## Cliente
 **Amazônia Marketing & Consultoria Ltda.**
 
-
 ## O Problema
 O processo atual de **cadastramento e certificação** não conversa com o mercado.  
 Isso gera:
@@ -45,6 +44,7 @@ O objetivo é entregar um MVP funcional que demonstre os fluxos essenciais de ce
    - Status de produção  
    - Status de comercialização  
 4. **Geração de Anúncios Automáticos em Marketplaces**
+   - Marketing digital de produtores e empresas
 
 
 ## Equipe Alpha

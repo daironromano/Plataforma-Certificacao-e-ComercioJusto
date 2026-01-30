@@ -101,8 +101,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Engine padrão do Django para MySQL
         'NAME': 'amazonia_marketing',          # Nome exato do banco que criamos
-        'USER': 'django_user',                 # Seu usuário do MySQL
-        'PASSWORD': 'django123',               # Senha
+        'USER': 'root',                 # Seu usuário do MySQL
+        'PASSWORD': 'admin',               # Senha
         'HOST': '127.0.0.1',                   # Localhost
         'PORT': '3306',                        # Porta padrão
         'OPTIONS': {

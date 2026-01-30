@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pagamento Cancelado - Amazônia Marketing{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; margin: 3rem auto; padding: 0 1rem;">
+    
+    <div style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 3rem 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        <h1 style="margin: 0 0 0.5rem 0; font-size: 2rem;">Pagamento Cancelado</h1>
+        <p style="margin: 0; opacity: 0.9;">Sua transação foi cancelada ou rejeitada</p>
+    </div>
+
+    <div style="background: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2 style="color: #2c3e50; margin: 0 0 1.5rem 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 1rem;">
+            Informações do Pedido
+        </h2>
+        
+        <div style="display: grid; gap: 1rem;">
+            <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem;">
+                <span style="font-weight: 600; color: #7f8c8d;">Número do Pedido:</span>
+                <span style="color: #2c3e50;">#{{ pedido.pk }}</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem;">
+                <span style="font-weight: 600; color: #7f8c8d;">Valor:</span>
+                <span style="color: #2c3e50;">R$ {{ pedido.total|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: #f8d7da; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid #721c24;">
+        <h3 style="color: #721c24; margin: 0 0 1rem 0;">O Que Aconteceu?</h3>
+        <p style="color: #721c24; margin: 0;">
+            Seu pagamento foi cancelado. Isso pode acontecer por:
+        </p>
+        <ul style="color: #721c24; margin: 1rem 0 0 0; padding-left: 1.5rem;">
+            <li>Você cancelou a transação</li>
+            <li>O cartão foi recusado pelo banco</li>
+            <li>Dados de pagamento inválidos</li>
+            <li>Limite de crédito insuficiente</li>
+        </ul>
+    </div>
+
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{% url 'checkout' %}" style="padding: 1rem 2rem; background: #27ae60; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+            Tentar Novamente
+        </a>
+        <a href="{% url 'home_publica' %}" style="padding: 1rem 2rem; background: #95a5a6; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+            Voltar ao Início
+        </a>
+    </div>
+
+</div>
+{% endblock %}

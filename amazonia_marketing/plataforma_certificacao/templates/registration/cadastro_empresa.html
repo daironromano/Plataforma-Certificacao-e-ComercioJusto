@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 500px; margin: 50px auto;">
+    <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size: 60px; margin-bottom: 10px;">🏢</div>
+            <h2 style="color: #007bff;">Cadastro de Empresa</h2>
+            <p style="color: #666;">Preencha os dados da sua empresa</p>
+        </div>
+        
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            
+            <!-- Razão Social -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="{{ form.razao_social.id_for_label }}" style="font-weight: bold; margin-bottom: 5px; display: block;">Razão Social *</label>
+                {{ form.razao_social }}
+                {% if form.razao_social.errors %}
+                    <small style="color: red;">{{ form.razao_social.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- CNPJ -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="{{ form.cnpj.id_for_label }}" style="font-weight: bold; margin-bottom: 5px; display: block;">CNPJ *</label>
+                {{ form.cnpj }}
+                {% if form.cnpj.errors %}
+                    <small style="color: red;">{{ form.cnpj.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Nome do Responsável -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="{{ form.nome.id_for_label }}" style="font-weight: bold; margin-bottom: 5px; display: block;">Nome do Responsável *</label>
+                {{ form.nome }}
+                {% if form.nome.errors %}
+                    <small style="color: red;">{{ form.nome.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Email -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="{{ form.email.id_for_label }}" style="font-weight: bold; margin-bottom: 5px; display: block;">Email Corporativo *</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <small style="color: red;">{{ form.email.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Telefone -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="{{ form.telefone.id_for_label }}" style="font-weight: bold; margin-bottom: 5px; display: block;">Telefone</label>
+                {{ form.telefone }}
+                {% if form.telefone.errors %}
+                    <small style="color: red;">{{ form.telefone.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Endereço -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="{{ form.endereco.id_for_label }}" style="font-weight: bold; margin-bottom: 5px; display: block;">Endereço da Empresa</label>
+                {{ form.endereco }}
+                {% if form.endereco.errors %}
+                    <small style="color: red;">{{ form.endereco.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Senha -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="{{ form.senha.id_for_label }}" style="font-weight: bold; margin-bottom: 5px; display: block;">Senha *</label>
+                {{ form.senha }}
+                <small style="color: #666;">{{ form.senha.help_text }}</small>
+                {% if form.senha.errors %}
+                    <small style="color: red; display: block;">{{ form.senha.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Confirmar Senha -->
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label for="{{ form.confirmar_senha.id_for_label }}" style="font-weight: bold; margin-bottom: 5px; display: block;">Confirmar Senha *</label>
+                {{ form.confirmar_senha }}
+                {% if form.confirmar_senha.errors %}
+                    <small style="color: red;">{{ form.confirmar_senha.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Aviso sobre Documentação -->
+            <div style="background: #e7f3ff; border-left: 4px solid #007bff; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                <p style="margin: 0; color: #004085; font-size: 0.9rem;">
+                    <strong>ℹ️ Importante:</strong> Após criar a conta, você precisará enviar documentação (CNPJ, Contrato Social e Alvará) para aprovação.
+                </p>
+            </div>
+            
+            <!-- Botões -->
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; margin-bottom: 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                Cadastrar Empresa
+            </button>
+            
+            <a href="{% url 'escolher_tipo_cadastro' %}" class="btn btn-secondary" style="width: 100%; padding: 12px; display: inline-block; text-align: center; text-decoration: none; background-color: #6c757d; color: white; border-radius: 5px; font-weight: bold;">
+                Voltar
+            </a>
+        </form>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="color: #666;">Já tem uma conta? 
+                <a href="{% url 'login' %}" style="color: #007bff; text-decoration: none; font-weight: bold;">Faça login</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

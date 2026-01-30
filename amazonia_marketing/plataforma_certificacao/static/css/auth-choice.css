@@ -1,0 +1,226 @@
+/* ============================================================================
+   TELA DE ESCOLHA DE TIPO - Estilos para seleção Produtor/Empresa
+   ============================================================================ */
+
+@import url('variables.css');
+
+body.auth-choice-page {
+    background: linear-gradient(135deg, var(--verde-amazonia) 0%, #0a4d01 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: var(--spacing-md);
+}
+
+/* ============== CONTAINER DE ESCOLHA ============== */
+.choice-container {
+    width: 100%;
+    max-width: 600px;
+    z-index: 1;
+    animation: slideUp 0.6s ease-out;
+}
+
+.choice-card {
+    background: var(--branco);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+/* ============== PERFIL DO USUÁRIO ============== */
+.user-profile {
+    margin-bottom: var(--spacing-xl);
+    animation: fadeIn 0.8s ease-out;
+}
+
+.user-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: var(--radius-full);
+    margin: 0 auto var(--spacing-lg);
+    border: 5px solid var(--amarelo-sol);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    background: var(--cinza-claro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-avatar.placeholder {
+    font-size: 50px;
+}
+
+.user-name {
+    font-size: var(--font-size-xl);
+    color: var(--verde-amazonia);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.user-email {
+    font-size: var(--font-size-sm);
+    color: var(--cinza-escuro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+}
+
+.user-email::before {
+    content: '📧';
+    font-size: var(--font-size-lg);
+}
+
+/* ============== PROMPT DE ESCOLHA ============== */
+.choice-prompt {
+    background: linear-gradient(135deg, rgba(218, 187, 44, 0.1), rgba(28, 62, 29, 0.05));
+    border: 2px solid var(--amarelo-sol);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.choice-prompt p {
+    font-size: var(--font-size-lg);
+    color: var(--verde-amazonia);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ============== BOTÕES DE ESCOLHA ============== */
+.choice-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.choice-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl) var(--spacing-md);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--branco);
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    gap: var(--spacing-md);
+}
+
+.choice-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.choice-btn:active {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Produtor - Verde */
+.choice-btn.produtor {
+    background: linear-gradient(135deg, #27AE60 0%, #229954 100%);
+}
+
+.choice-btn.produtor:hover {
+    background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+}
+
+/* Empresa - Azul */
+.choice-btn.empresa {
+    background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+}
+
+.choice-btn.empresa:hover {
+    background: linear-gradient(135deg, #5DADE2 0%, #3498DB 100%);
+}
+
+/* Ícone do botão */
+.choice-btn-icon {
+    font-size: 48px;
+}
+
+.choice-btn-title {
+    font-size: var(--font-size-lg);
+}
+
+.choice-btn-subtitle {
+    font-size: var(--font-size-xs);
+    font-weight: 400;
+    opacity: 0.95;
+    margin-top: var(--spacing-xs);
+}
+
+/* ============== RODAPÉ DE INFORMAÇÃO ============== */
+.choice-footer {
+    border-top: 1px solid var(--cinza-medio);
+    padding-top: var(--spacing-lg);
+}
+
+.choice-footer p {
+    font-size: var(--font-size-sm);
+    color: var(--cinza-escuro);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.choice-footer p::before {
+    content: '💡';
+    font-size: var(--font-size-lg);
+}
+
+/* ============== RESPONSIVIDADE ============== */
+@media (max-width: 600px) {
+    .choice-container {
+        max-width: 100%;
+        padding: var(--spacing-md);
+    }
+
+    .choice-card {
+        padding: var(--spacing-lg);
+    }
+
+    .choice-buttons {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .choice-btn {
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+
+    .choice-btn-icon {
+        font-size: 40px;
+    }
+
+    .user-avatar {
+        width: 100px;
+        height: 100px;
+        border-width: 4px;
+    }
+
+    .user-name {
+        font-size: var(--font-size-lg);
+    }
+}

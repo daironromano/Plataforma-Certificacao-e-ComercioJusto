@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meu Carrinho - Amazônia Marketing{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
+    
+    <div style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h1 style="margin: 0 0 0.5rem 0; font-size: 2rem;">🛒 Meu Carrinho</h1>
+        <p style="margin: 0; opacity: 0.9;">Revise seus itens antes de finalizar a compra</p>
+    </div>
+
+    {% if itens %}
+    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem;">
+        
+        <!-- Lista de Itens -->
+        <div>
+            {% for item in itens %}
+            <div style="background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="display: flex; gap: 1.5rem; align-items: center;">
+                    
+                    <!-- Imagem do Produto -->
+                    <div style="width: 120px; height: 120px; border-radius: 8px; overflow: hidden; background: #f4f4f4; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        {% if item.produto.imagem %}
+                        <img src="{{ item.produto.imagem.url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                        <span style="color: #999; font-weight: bold;">Sem Foto</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Informações do Produto -->
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0 0 0.5rem 0; color: #2c3e50;">{{ item.produto.nome }}</h3>
+                        <p style="color: #7f8c8d; margin: 0 0 0.5rem 0;">{{ item.produto.categoria }}</p>
+                        <p style="color: #27ae60; font-weight: bold; font-size: 1.25rem; margin: 0;">R$ {{ item.preco_unitario }}</p>
+                    </div>
+                    
+                    <!-- Controles de Quantidade -->
+                    <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+                        <form method="post" action="{% url 'atualizar_quantidade_carrinho' item.pk %}" style="display: flex; gap: 0.5rem; align-items: center;">
+                            {% csrf_token %}
+                            <input type="number" name="quantidade" value="{{ item.quantidade }}" min="1" style="width: 70px; padding: 0.5rem; border: 2px solid #e0e0e0; border-radius: 6px; text-align: center; font-weight: bold;">
+                            <button type="submit" style="padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                                Atualizar
+                            </button>
+                        </form>
+                        
+                        <a href="{% url 'remover_do_carrinho' item.pk %}" 
+                           onclick="return confirm('Deseja remover este item do carrinho?');"
+                           style="color: #e74c3c; text-decoration: none; font-weight: bold; font-size: 0.9rem;">
+                            🗑️ Remover
+                        </a>
+                        
+                        <div style="color: #2c3e50; font-weight: bold; font-size: 1.1rem;">
+                            Subtotal: R$ {{ item.get_subtotal }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Resumo do Pedido -->
+        <div>
+            <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 20px;">
+                <h2 style="margin: 0 0 1.5rem 0; color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 1rem;">
+                    Resumo do Pedido
+                </h2>
+                
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: #7f8c8d;">Itens ({{ quantidade_itens }}):</span>
+                        <span style="font-weight: 600;">R$ {{ total }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: #7f8c8d;">Frete:</span>
+                        <span style="font-weight: 600; color: #27ae60;">Grátis</span>
+                    </div>
+                </div>
+                
+                <div style="border-top: 2px solid #ecf0f1; padding-top: 1rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 1.25rem;">
+                        <span style="font-weight: bold; color: #2c3e50;">Total:</span>
+                        <span style="font-weight: bold; color: #27ae60;">R$ {{ total }}</span>
+                    </div>
+                </div>
+                
+                <a href="{% url 'checkout' %}" style="display: block; width: 100%; padding: 1rem; background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white; text-align: center; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; transition: transform 0.3s;">
+                    Finalizar Compra
+                </a>
+                
+                <a href="{% url 'home_publica' %}" style="display: block; width: 100%; padding: 1rem; background: #95a5a6; color: white; text-align: center; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 1rem; transition: transform 0.3s;">
+                    Continuar Comprando
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <div style="background: white; padding: 3rem; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="font-size: 5rem; margin-bottom: 1rem;">🛒</div>
+        <h2 style="color: #2c3e50; margin-bottom: 1rem;">Seu carrinho está vazio</h2>
+        <p style="color: #7f8c8d; margin-bottom: 2rem;">Que tal explorar nossos produtos?</p>
+        <a href="{% url 'home_publica' %}" style="display: inline-block; padding: 1rem 2rem; background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+            Explorar Produtos
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+
+<style>
+    a:hover, button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}

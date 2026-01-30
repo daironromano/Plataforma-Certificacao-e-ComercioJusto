@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalhes da Certificação #{{ certificacao.id_certificacao }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
+    
+    <!-- Cabeçalho -->
+    <div style="background: linear-gradient(135deg, #1C3E1D 0%, #1a3217 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="margin: 0 0 0.5rem 0;">Certificação #{{ certificacao.id_certificacao }}</h1>
+                <p style="margin: 0; opacity: 0.9;">Análise completa da solicitação</p>
+            </div>
+            <div style="text-align: right;">
+                <span style="display: inline-block; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; font-size: 1.1rem; background: rgba(255,255,255,0.2);">
+                    {% if certificacao.status_certificacao == 'pendente' %}
+                        Pendente
+                    {% elif certificacao.status_certificacao == 'aprovado' %}
+                        Aprovado
+                    {% else %}
+                        Reprovado
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid Principal -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+        
+        <!-- Coluna Esquerda: Informações Detalhadas -->
+        <div>
+            <!-- Card: Informações do Produto - Completo e Detalhado -->
+            <div style="background: white; padding: 1.2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.4rem; margin-bottom: 0.8rem; font-size: 1.1rem;">
+                    Detalhes do Produto
+                </h2>
+                
+                <!-- Imagem do Produto em Destaque -->
+                {% if produto.imagem %}
+                <div style="margin-bottom: 1rem;">
+                    <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" style="width: 100%; max-height: 350px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                </div>
+                {% endif %}
+
+                <!-- Grid de Informações Principais -->
+                <div style="background: #f8f9fa; padding: 0.9rem; border-radius: 6px; margin-bottom: 1rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; row-gap: 0.6rem;">
+                        <div>
+                            <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Nome do Produto:</strong>
+                            <p style="margin: 0; font-size: 1rem; color: #2c3e50; font-weight: 600;">{{ produto.nome }}</p>
+                        </div>
+                        <div>
+                            <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Preço Unitário:</strong>
+                            <p style="margin: 0; font-size: 1rem; color: #27ae60; font-weight: 600;">R$ {{ produto.preco|floatformat:2 }}</p>
+                        </div>
+                        <div>
+                            <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Status do Estoque:</strong>
+                            <p style="margin: 0; padding: 0.2rem 0.6rem; display: inline-block; border-radius: 4px; font-size: 0.9rem; background: {% if produto.status_estoque == 'disponivel' %}#d4edda{% else %}#f8d7da{% endif %}; color: {% if produto.status_estoque == 'disponivel' %}#155724{% else %}#721c24{% endif %}; font-weight: 600;">
+                                {% if produto.status_estoque == 'disponivel' %}Disponível{% else %}Esgotado{% endif %}
+                            </p>
+                        </div>
+                        <div>
+                            <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">ID do Produto:</strong>
+                            <p style="margin: 0; color: #7f8c8d; font-family: monospace; font-size: 0.95rem;">#{{ produto.id_produto }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Descrição Detalhada -->
+                <div style="margin-bottom: 1rem;">
+                    <strong style="color: #1C3E1D; display: block; margin-bottom: 0.4rem; font-size: 0.9rem;">Descrição:</strong>
+                    <div style="background: #f8f9fa; padding: 0.8rem; border-radius: 6px; border-left: 3px solid #1C3E1D;">
+                        <p style="margin: 0; color: #2c3e50; line-height: 1.6; white-space: pre-wrap; font-size: 0.95rem;">{{ produto.descricao|default:"<em>Sem descrição fornecida pelo produtor</em>" }}</p>
+                    </div>
+                </div>
+
+                <!-- Informações Resumidas do Produtor Diretamente no Card -->
+                <div style="background: #e8f5e9; padding: 0.8rem; border-radius: 6px; border-left: 3px solid #1C3E1D;">
+                    <strong style="color: #1C3E1D; display: block; margin-bottom: 0.4rem; font-size: 0.9rem;">Produzido por:</strong>
+                    <p style="margin: 0.2rem 0; color: #2c3e50; font-size: 0.95rem;"><strong>{{ produtor.nome }}</strong></p>
+                    <p style="margin: 0.2rem 0; color: #7f8c8d; font-size: 0.9rem;">{{ produtor.email }}</p>
+                    {% if produtor.telefone %}
+                    <p style="margin: 0.2rem 0; color: #7f8c8d; font-size: 0.9rem;">{{ produtor.telefone }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card: Autodeclaração -->
+            <div style="background: white; padding: 1.2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.4rem; margin-bottom: 0.8rem; font-size: 1.1rem;">
+                    Autodeclaração
+                </h2>
+                
+                {% if certificacao.texto_autodeclaracao %}
+                <div style="background: #f8f9fa; padding: 0.8rem; border-radius: 6px; border-left: 3px solid #1C3E1D;">
+                    <p style="margin: 0; line-height: 1.6; color: #2c3e50; white-space: pre-wrap; font-size: 0.95rem;">{{ certificacao.texto_autodeclaracao }}</p>
+                </div>
+                {% else %}
+                <p style="color: #7f8c8d; font-style: italic; font-size: 0.95rem; margin: 0;">Nenhum texto de autodeclaração fornecido.</p>
+                {% endif %}
+            </div>
+
+            <!-- Card: Documentos -->
+            <div style="background: white; padding: 1.2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.4rem; margin-bottom: 0.8rem; font-size: 1.1rem;">
+                    Documentos Anexados
+                </h2>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    {% if certificacao.documento %}
+                    <a href="{{ certificacao.documento.url }}" target="_blank" style="display: flex; align-items: center; padding: 0.6rem; background: #f8f9fa; border-radius: 6px; text-decoration: none; color: #2c3e50; border: 1px solid #e0e0e0; transition: background 0.3s; font-size: 0.95rem;">
+                        <span>Documento Principal</span>
+                        <span style="margin-left: auto; color: #3498db; font-weight: 600;">Abrir →</span>
+                    </a>
+                    {% else %}
+                    <div style="padding: 0.6rem; background: #f8f9fa; border-radius: 6px; color: #7f8c8d; text-align: center;">
+                        <p style="margin: 0; font-size: 0.95rem;">Nenhum documento principal enviado</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if certificacao.documento_2 %}
+                    <a href="{{ certificacao.documento_2.url }}" target="_blank" style="display: flex; align-items: center; padding: 0.6rem; background: #f8f9fa; border-radius: 6px; text-decoration: none; color: #2c3e50; border: 1px solid #e0e0e0; transition: background 0.3s; font-size: 0.95rem;">
+                        <span>Documento Adicional 1</span>
+                        <span style="margin-left: auto; color: #3498db; font-weight: 600;">Abrir →</span>
+                    </a>
+                    {% endif %}
+                    
+                    {% if certificacao.documento_3 %}
+                    <a href="{{ certificacao.documento_3.url }}" target="_blank" style="display: flex; align-items: center; padding: 0.6rem; background: #f8f9fa; border-radius: 6px; text-decoration: none; color: #2c3e50; border: 1px solid #e0e0e0; transition: background 0.3s; font-size: 0.95rem;">
+                        <span>Documento Adicional 2</span>
+                        <span style="margin-left: auto; color: #3498db; font-weight: 600;">Abrir →</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna Direita: Informações Detalhadas do Produtor e Ações -->
+        <div>
+            <!-- Card: Perfil Completo do Produtor -->
+            <div style="background: white; padding: 1.2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.4rem; margin-bottom: 0.8rem; font-size: 1.1rem;">
+                    Informações do Produtor
+                </h2>
+                
+                <!-- Dados Básicos do Produtor -->
+                <div style="background: #f8f9fa; padding: 0.8rem; border-radius: 6px; margin-bottom: 0.8rem;">
+                    <div style="margin-bottom: 0.7rem;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Nome Completo:</strong>
+                        <p style="margin: 0; color: #2c3e50; font-size: 1rem; font-weight: 600;">{{ produtor.nome }}</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 0.7rem;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Email:</strong>
+                        <p style="margin: 0; color: #2c3e50; font-size: 0.95rem;">
+                            <a href="mailto:{{ produtor.email }}" style="color: #3498db; text-decoration: none;">{{ produtor.email }}</a>
+                        </p>
+                    </div>
+                    
+                    {% if produtor.telefone %}
+                    <div style="margin-bottom: 0.7rem;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Telefone:</strong>
+                        <p style="margin: 0; color: #2c3e50; font-size: 0.95rem;">{{ produtor.telefone }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if produtor.endereco %}
+                    <div>
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Endereço:</strong>
+                        <p style="margin: 0; color: #2c3e50; font-size: 0.95rem;">{{ produtor.endereco }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Informações de Perfil (se disponíveis) -->
+                {% if produtor.produtor_profile %}
+                    {% with perfil=produtor.produtor_profile %}
+                    <div style="background: #e8f5e9; padding: 0.8rem; border-radius: 6px; border-left: 3px solid #1C3E1D;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.6rem; font-size: 0.95rem;">Perfil do Produtor:</strong>
+                        
+                        {% if perfil.cpf %}
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong style="color: #1C3E1D; font-size: 0.85rem;">CPF:</strong>
+                            <p style="margin: 0.15rem 0 0 0; color: #2c3e50; font-family: monospace; font-size: 0.9rem;">{{ perfil.cpf }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if perfil.bio %}
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong style="color: #1C3E1D; font-size: 0.85rem;">Bio:</strong>
+                            <p style="margin: 0.15rem 0 0 0; color: #2c3e50; font-size: 0.9rem;">{{ perfil.bio }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if perfil.cidade or perfil.estado %}
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong style="color: #1C3E1D; font-size: 0.85rem;">Localização:</strong>
+                            <p style="margin: 0.15rem 0 0 0; color: #2c3e50; font-size: 0.9rem;">
+                                {{ perfil.cidade }}{% if perfil.estado %}, {{ perfil.estado }}{% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if perfil.whatsapp or perfil.instagram or perfil.facebook %}
+                        <div>
+                            <strong style="color: #1C3E1D; font-size: 0.85rem;">Redes Sociais:</strong>
+                            <div style="margin-top: 0.3rem; display: flex; flex-direction: column; gap: 0.15rem;">
+                                {% if perfil.whatsapp %}
+                                <p style="margin: 0; color: #2c3e50; font-size: 0.9rem;">WhatsApp: {{ perfil.whatsapp }}</p>
+                                {% endif %}
+                                {% if perfil.instagram %}
+                                <p style="margin: 0; color: #2c3e50; font-size: 0.9rem;">Instagram: <a href="https://instagram.com/{{ perfil.instagram }}" target="_blank" style="color: #3498db; text-decoration: none;">@{{ perfil.instagram }}</a></p>
+                                {% endif %}
+                                {% if perfil.facebook %}
+                                <p style="margin: 0; color: #2c3e50; font-size: 0.9rem;">Facebook: {{ perfil.facebook }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endwith %}
+                {% endif %}
+            </div>
+
+            <!-- Card: Histórico de Certificações do Produtor -->
+            <div style="background: white; padding: 1.2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.4rem; margin-bottom: 0.8rem; font-size: 1.1rem;">
+                    Histórico de Certificações
+                </h2>
+                
+                <div style="background: #f8f9fa; padding: 0.8rem; border-radius: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem;">
+                    <div style="text-align: center;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.85rem;">Total de Produtos:</strong>
+                        <p style="margin: 0; font-size: 1.3rem; color: #3498db; font-weight: 600;">{{ total_produtos }}</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.85rem;">Certificações Pendentes:</strong>
+                        <p style="margin: 0; font-size: 1.3rem; color: #f39c12; font-weight: 600;">{{ certificacoes_pendentes }}</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.85rem;">Certificações Aprovadas:</strong>
+                        <p style="margin: 0; font-size: 1.3rem; color: #27ae60; font-weight: 600;">{{ certificacoes_aprovadas }}</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.85rem;">Taxa de Aprovação:</strong>
+                        <p style="margin: 0; font-size: 1.3rem; color: #2c3e50; font-weight: 600;">
+                            {% widthratio certificacoes_aprovadas certificacoes_pendentes|add:certificacoes_aprovadas 100 %}%
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Informações da Certificação Atual -->
+            <div style="background: white; padding: 1.2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.4rem; margin-bottom: 0.8rem; font-size: 1.1rem;">
+                    Informações da Certificação
+                </h2>
+                
+                <div style="background: #f8f9fa; padding: 0.8rem; border-radius: 6px;">
+                    <div style="margin-bottom: 0.6rem;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Certificação ID:</strong>
+                        <p style="margin: 0; color: #2c3e50; font-family: monospace; font-weight: 600; font-size: 0.95rem;">#{{ certificacao.id_certificacao }}</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 0.6rem;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Data de Envio:</strong>
+                        <p style="margin: 0; color: #2c3e50; font-size: 0.95rem;">{{ certificacao.data_envio|date:"d \d\e M \d\e Y" }}</p>
+                    </div>
+                    
+                    {% if certificacao.data_resposta %}
+                    <div style="margin-bottom: 0.6rem;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Data de Resposta:</strong>
+                        <p style="margin: 0; color: #2c3e50; font-size: 0.95rem;">{{ certificacao.data_resposta|date:"d \d\e M \d\e Y" }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div style="margin-bottom: 0.6rem;">
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Status Atual:</strong>
+                        <p style="margin: 0; display: inline-block; padding: 0.4rem 0.8rem; border-radius: 4px; font-weight: 600; font-size: 0.95rem; background: 
+                        {% if certificacao.status_certificacao == 'pendente' %}#fff3cd; color: #856404;
+                        {% elif certificacao.status_certificacao == 'aprovado' %}#d4edda; color: #155724;
+                        {% else %}#f8d7da; color: #721c24;
+                        {% endif %}">
+                            {% if certificacao.status_certificacao == 'pendente' %}Pendente de Análise
+                            {% elif certificacao.status_certificacao == 'aprovado' %}Aprovado
+                            {% else %}Reprovado
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    {% if certificacao.admin_responsavel %}
+                    <div>
+                        <strong style="color: #1C3E1D; display: block; margin-bottom: 0.2rem; font-size: 0.9rem;">Auditor Responsável:</strong>
+                        <p style="margin: 0; color: #2c3e50; font-size: 0.95rem;">{{ certificacao.admin_responsavel.nome }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card: Observações do Auditor -->
+            {% if certificacao.observacoes_admin or certificacao.status_certificacao != 'pendente' %}
+            <div style="background: white; padding: 1.2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.4rem; margin-bottom: 0.8rem; font-size: 1.1rem;">
+                    Observações do Auditor
+                </h2>
+                
+                {% if certificacao.observacoes_admin %}
+                <div style="background: #f8f9fa; padding: 0.8rem; border-radius: 6px; border-left: 3px solid #1C3E1D;">
+                    <p style="margin: 0; color: #2c3e50; line-height: 1.6; white-space: pre-wrap; font-size: 0.95rem;">{{ certificacao.observacoes_admin }}</p>
+                </div>
+                {% else %}
+                <p style="margin: 0; color: #7f8c8d; font-style: italic; font-size: 0.95rem;">Nenhuma observação registrada.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Card: Ações (apenas se pendente) -->
+            {% if certificacao.status_certificacao == 'pendente' %}
+            <div style="background: white; padding: 1.2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h2 style="color: #1C3E1D; border-bottom: 2px solid #1C3E1D; padding-bottom: 0.4rem; margin-bottom: 0.8rem; font-size: 1.1rem;">
+                    Ações de Auditoria
+                </h2>
+                
+                <form method="post" action="{% url 'admin_responder_certificacao' certificacao.id_certificacao %}">
+                    {% csrf_token %}
+                    <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                        <button type="submit" name="acao" value="aprovar" style="width: 100%; padding: 0.7rem; border: none; border-radius: 6px; font-weight: 600; font-size: 0.95rem; background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; cursor: pointer; transition: transform 0.2s;">
+                            Aprovar Certificação
+                        </button>
+                        
+                        <button type="submit" name="acao" value="rejeitar" style="width: 100%; padding: 0.7rem; border: none; border-radius: 6px; font-weight: 600; font-size: 0.95rem; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; cursor: pointer; transition: transform 0.2s;">
+                            Rejeitar Certificação
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botão Voltar -->
+    <div style="margin-top: 1.5rem; text-align: center;">
+        <a href="{% url 'home_admin' %}" style="display: inline-block; padding: 0.65rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; background: #95a5a6; color: white; transition: background 0.3s;">
+            Voltar ao Dashboard
+        </a>
+    </div>
+</div>
+
+<style>
+    a[href]:hover {
+        background: #e8e8e8;
+    }
+    
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}

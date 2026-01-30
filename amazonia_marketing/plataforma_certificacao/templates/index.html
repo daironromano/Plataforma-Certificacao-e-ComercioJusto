@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Amazônia Marketing{% endblock %}
+
+{% block content %}
+
+<style>
+    /* BANNER  */
+    .banner { 
+        background-color: var(--verde-amazonia); 
+        color: white; 
+        text-align: center;
+        padding: 60px 20px; 
+        margin-bottom: 40px;
+        width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(28, 62, 29, 0.15); 
+    }
+    
+    .banner h1 {
+        font-size: 2.5rem; 
+        margin-bottom: 1rem; 
+        font-weight: 700;
+    }
+    
+    .banner p {
+        font-size: 1.2rem; 
+        opacity: 0.95; 
+        max-width: 700px; 
+        margin: 0 auto;
+    }
+
+    /* TÍTULO */
+    .produtos-titulo {
+        margin-bottom: 1.5rem;
+        color: var(--verde-amazonia);
+        font-size: 1.8rem;
+        border-left: 5px solid var(--amarelo-sol);
+        padding-left: 15px;
+    }
+
+    /* GRID DE PRODUTOS */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); 
+        gap: 25px; 
+        padding-bottom: 50px;
+    }
+
+    .card {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        display: flex;       
+        flex-direction: column;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .card-img-container {
+        height: 200px; 
+        overflow: hidden;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .card-body {
+        padding: 15px;
+        flex-grow: 1; 
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .btn-detalhes {
+        width: 100%; 
+        padding: 10px; 
+        background-color: var(--verde-amazonia); 
+        color: white; 
+        border: none; 
+        border-radius: 6px; 
+        cursor: pointer; 
+        margin-top: 10px;
+        font-weight: bold;
+        transition: background 0.2s;
+    }
+    
+    .btn-detalhes:hover {
+        background-color: #142e15;
+    }
+
+    /* SELO DE QUALIDADE */
+    .selo-flutuante {
+        position: absolute; 
+        top: 10px; 
+        right: 10px; 
+        background-color: #DABB2C; 
+        color: #1C3E1D; 
+        padding: 5px 12px; 
+        border-radius: 20px; 
+        font-weight: bold; 
+        font-size: 0.75rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+
+<div class="banner">
+    <h1>Do campo para a mesa</h1>
+    <p>Conectando produtores rurais a consumidores conscientes. Produtos certificados e sustentáveis da Amazônia.</p>
+
+    <div style="margin-top: 25px;">
+        {% if user.is_authenticated %}
+            {% if user.tipo_usuario == 'produtor' %}
+                <a href="{% url 'home_produtor' %}" class="btn" style="padding: 12px 30px; background-color: white; color: var(--verde-amazonia); border: none; font-weight: bold; text-decoration: none; border-radius: 5px;">
+                    Acessar Meu Painel
+                </a>
+            {% elif user.tipo_usuario == 'empresa' %}
+                <a href="{% url 'home_empresa' %}" class="btn" style="padding: 12px 30px; background-color: white; color: var(--verde-amazonia); border: none; font-weight: bold; text-decoration: none; border-radius: 5px;">
+                    Painel da Empresa
+                </a>
+            {% elif user.tipo_usuario == 'auditor' or user.is_superuser %}
+                <a href="{% url 'home_admin' %}" class="btn" style="padding: 12px 30px; background-color: white; color: var(--verde-amazonia); border: none; font-weight: bold; text-decoration: none; border-radius: 5px;">
+                    Área de Auditoria
+                </a>
+            {% endif %}
+            
+        {% else %}
+            <a href="{% url 'escolher_tipo_cadastro' %}" class="btn" style="padding: 12px 30px; background-color: white; color: var(--verde-amazonia); border: none; font-weight: bold; text-decoration: none; border-radius: 5px;">
+                Quero Comprar ou Vender
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<h2 class="produtos-titulo">Vitrine de Produtos</h2>
+
+<div class="grid">
+    
+    {% for p in produtos %}
+        <div class="card">
+            
+            {% if p.tem_selo %}
+                <div class="selo-flutuante">
+                    Certificado
+                </div>
+            {% endif %}
+
+            <div class="card-img-container">
+                {% if p.imagem %}
+                    <img src="{{ p.imagem.url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                    <span style="color: #999; font-size: 0.9rem;">Imagem Indisponível</span>
+                {% endif %}
+            </div>
+
+            <div class="card-body">
+                <div>
+                    <!-- Status do Produto -->
+                    <div style="margin-bottom: 10px;">
+                        {% if p.status_estoque == 'disponivel' %}
+                        <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); color: #155724; font-size: 0.75rem; font-weight: 700; border-radius: 12px; letter-spacing: 0.3px;">
+                            <span style="width: 6px; height: 6px; background: #28a745; border-radius: 50%; display: inline-block;"></span>
+                            DISPONÍVEL
+                        </span>
+                        {% elif p.status_estoque == 'esgotado' %}
+                        <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); color: #721c24; font-size: 0.75rem; font-weight: 700; border-radius: 12px; letter-spacing: 0.3px;">
+                            <span style="width: 6px; height: 6px; background: #dc3545; border-radius: 50%; display: inline-block;"></span>
+                            ESGOTADO
+                        </span>
+                        {% else %}
+                        <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); color: #856404; font-size: 0.75rem; font-weight: 700; border-radius: 12px; letter-spacing: 0.3px;">
+                            <span style="width: 6px; height: 6px; background: #ffc107; border-radius: 50%; display: inline-block;"></span>
+                            {{ p.status_estoque|upper }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <h3 style="margin: 0; color: #333; font-size: 1.1rem;">{{ p.nome }}</h3>
+                    <p style="color: #777; font-size: 0.85rem; margin-top: 5px;">{{ p.categoria|default:"Sem categoria" }}</p>
+                </div>
+                
+                <div>
+                    <p style="color: var(--verde-amazonia); font-weight: 800; font-size: 1.3rem; margin: 15px 0 5px 0;">
+                        R$ {{ p.preco|floatformat:2 }}
+                    </p>
+                    
+                    <div style="display: flex; gap: 0.5rem;">
+                        {% if p.status_estoque == 'esgotado' %}
+                        <button disabled style="flex: 1; padding: 10px; background-color: #6c757d; color: white; border: none; border-radius: 6px; text-align: center; font-weight: bold; cursor: not-allowed; opacity: 0.6;">
+                            Indisponível
+                        </button>
+                        {% else %}
+                            {% if request.session.usuario_id %}
+                            <a href="{% url 'adicionar_ao_carrinho' p.id_produto %}" style="flex: 1; padding: 10px; background-color: var(--amarelo-sol); color: var(--verde-amazonia); border: none; border-radius: 6px; text-align: center; text-decoration: none; font-weight: bold; transition: background 0.2s;">
+                                Comprar
+                            </a>
+                            {% else %}
+                            <a href="{% url 'login' %}" style="flex: 1; padding: 10px; background-color: var(--amarelo-sol); color: var(--verde-amazonia); border: none; border-radius: 6px; text-align: center; text-decoration: none; font-weight: bold; transition: background 0.2s;">
+                                Comprar
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 50px; background: white; border-radius: 12px; border: 1px dashed #ccc;">
+            <h3 style="color: #555;">Nenhum produto disponível no momento.</h3>
+            <p style="color: #888;">Nossos produtores estão colhendo novidades para você.</p>
+        </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

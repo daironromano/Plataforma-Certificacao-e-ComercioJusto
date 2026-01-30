@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }} - Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1400px; margin: 2rem auto; padding: 0 1rem;">
+    
+    <!-- Cabeçalho -->
+    <div class="header-box {% if status_filtro == 'pendente' %}header-pendente{% elif status_filtro == 'aprovado' %}header-aprovado{% else %}header-reprovado{% endif %}">
+        <h1 style="margin: 0 0 0.5rem 0; font-size: 2rem;">
+            {{ titulo }}
+        </h1>
+        <p style="margin: 0; opacity: 0.9;">Total: {{ certificacoes|length }} certificação{{ certificacoes|length|pluralize:"s" }}</p>
+    </div>
+
+    <!-- Tabela de Certificações -->
+    {% if certificacoes %}
+    <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background: #2c3e50; color: white;">
+                <tr>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600;">ID</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Produto</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Produtor</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Data Envio</th>
+                    {% if status_filtro != 'pendente' %}
+                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Data Resposta</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Auditor</th>
+                    {% endif %}
+                    <th style="padding: 1rem; text-align: center; font-weight: 600;">Status</th>
+                    <th style="padding: 1rem; text-align: center; font-weight: 600;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cert in certificacoes %}
+                <tr style="border-bottom: 1px solid #ecf0f1; transition: background 0.3s;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                    <td style="padding: 1rem;">
+                        <strong style="color: #1C3E1D;">#{{ cert.id_certificacao }}</strong>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            {% if cert.produto.imagem %}
+                            <img src="{{ cert.produto.imagem.url }}" alt="{{ cert.produto.nome }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                            {% endif %}
+                            <div>
+                                <strong style="display: block; color: #2c3e50;">{{ cert.produto.nome }}</strong>
+                                <small style="color: #7f8c8d;">{{ cert.produto.categoria }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: 1rem;">
+                        <div>
+                            <strong style="display: block; color: #2c3e50;">{{ cert.produto.usuario.nome }}</strong>
+                            <small style="color: #7f8c8d;">{{ cert.produto.usuario.email }}</small>
+                        </div>
+                    </td>
+                    <td style="padding: 1rem; color: #34495e;">
+                        {{ cert.data_envio|date:"d/m/Y" }}
+                    </td>
+                    {% if status_filtro != 'pendente' %}
+                    <td style="padding: 1rem; color: #34495e;">
+                        {{ cert.data_resposta|date:"d/m/Y"|default:"-" }}
+                    </td>
+                    <td style="padding: 1rem; color: #34495e;">
+                        {{ cert.admin_responsavel.nome|default:"-" }}
+                    </td>
+                    {% endif %}
+                    <td style="padding: 1rem; text-align: center;">
+                        <span class="status-label {% if cert.status_certificacao == 'pendente' %}status-pendente{% elif cert.status_certificacao == 'aprovado' %}status-aprovado{% else %}status-reprovado{% endif %}">
+                            {% if cert.status_certificacao == 'pendente' %}
+                                Pendente
+                            {% elif cert.status_certificacao == 'aprovado' %}
+                                Aprovado
+                            {% else %}
+                                Reprovado
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem; text-align: center;">
+                        <a href="{% url 'detalhe_certificacao' cert.id_certificacao %}" style="display: inline-block; padding: 0.5rem 1rem; background: linear-gradient(135deg, #1C3E1D 0%, #153c1a 100%); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; transition: transform 0.2s;">
+                            Ver Detalhes
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="background: #f5f5f5; padding: 3rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
+        <h2 style="color: #7f8c8d; margin: 0 0 0.5rem 0;">Nenhuma certificação encontrada</h2>
+        <p style="color: #95a5a6; margin: 0;">Não há certificações {% if status_filtro == 'pendente' %}pendentes{% elif status_filtro == 'aprovado' %}aprovadas{% else %}reprovadas{% endif %} no momento.</p>
+    </div>
+    {% endif %}
+
+    <!-- Botões de Navegação -->
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; padding: 0 1rem;">
+        <a href="{% url 'home_admin' %}" style="padding: 0.75rem 1.5rem; background: #95a5a6; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background 0.3s; white-space: nowrap;">
+            ← Voltar ao Dashboard
+        </a>
+        
+        <a href="{% url 'lista_certificacoes_pendentes' %}" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #dabb2c 0%, #c9a620 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: transform 0.2s; white-space: nowrap;">
+            Certificações Pendentes
+        </a>
+        
+        <a href="{% url 'lista_certificacoes_aprovadas' %}" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #1C3E1D 0%, #153c1a 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: transform 0.2s; white-space: nowrap;">
+            Certificações Aprovadas
+        </a>
+        
+        <a href="{% url 'lista_certificacoes_reprovadas' %}" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: transform 0.2s; white-space: nowrap;">
+            Certificações Reprovadas
+        </a>
+    </div>
+</div>
+
+<style>
+    .header-box {
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .header-pendente {
+        background: linear-gradient(135deg, #dabb2c 0%, #c9a620 100%);
+    }
+
+    .header-aprovado {
+        background: linear-gradient(135deg, #1C3E1D 0%, #153c1a 100%);
+    }
+
+    .header-reprovado {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    }
+
+    .status-label {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .status-pendente {
+        background: #fff3cd;
+        color: #856404;
+    }
+    .status-aprovado {
+        background: #d4edda;
+        color: #155724;
+    }
+    .status-reprovado {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}

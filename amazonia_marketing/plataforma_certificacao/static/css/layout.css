@@ -1,0 +1,458 @@
+/* ============================================================================
+   LAYOUT GLOBAL - Header, Footer, Navigation
+   ============================================================================ */
+
+@import url('variables.css');
+
+/* ============== RESET E PADRÕES GLOBAIS ============== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: var(--font-primary);
+    color: var(--preto);
+    line-height: 1.6;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--fundo);
+}
+
+main {
+    flex: 1;
+}
+
+/* ============== HEADER / NAVEGAÇÃO ============== */
+header {
+    background: linear-gradient(135deg, var(--verde-amazonia) 0%, #0a4d01 100%);
+    color: var(--branco);
+    padding: var(--spacing-md) var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    text-decoration: none;
+    color: var(--branco);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+.logo:hover {
+    opacity: 0.85;
+}
+
+/* ============== NAVEGAÇÃO PRINCIPAL ============== */
+.nav-main {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: var(--spacing-lg);
+}
+
+.nav-links a {
+    color: var(--branco);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    position: relative;
+}
+
+.nav-links a:hover {
+    background: rgba(218, 187, 44, 0.2);
+    color: var(--amarelo-sol);
+}
+
+.nav-links a.active {
+    background: var(--amarelo-sol);
+    color: var(--verde-amazonia);
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--amarelo-sol);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.nav-links a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* ============== USUÁRIO / DROPDOWN ============== */
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.user-info {
+    text-align: right;
+    font-size: var(--font-size-sm);
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--amarelo-sol);
+}
+
+.user-role {
+    font-size: var(--font-size-xs);
+    opacity: 0.8;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    background: rgba(218, 187, 44, 0.2);
+    color: var(--branco);
+    border: 1px solid var(--amarelo-sol);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.dropdown-toggle:hover {
+    background: rgba(218, 187, 44, 0.3);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + var(--spacing-sm));
+    right: 0;
+    background: var(--branco);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    list-style: none;
+    overflow: hidden;
+    display: none;
+    z-index: 1000;
+    animation: slideDown 0.3s ease-out;
+}
+
+.dropdown-menu.active {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-menu li {
+    border-bottom: 1px solid var(--cinza-medio);
+}
+
+.dropdown-menu li:last-child {
+    border-bottom: none;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: var(--preto);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.dropdown-menu a:hover {
+    background: var(--cinza-claro);
+    color: var(--verde-amazonia);
+}
+
+/* ============== MENU HAMBURGUER (MOBILE) ============== */
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--branco);
+    font-size: var(--font-size-xl);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.hamburger:hover {
+    transform: scale(1.1);
+}
+
+/* ============== FOOTER ============== */
+footer {
+    background: var(--verde-amazonia);
+    color: var(--branco);
+    padding: var(--spacing-2xl) var(--spacing-lg);
+    margin-top: auto;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.footer-section h3 {
+    color: var(--amarelo-sol);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: var(--spacing-sm);
+}
+
+.footer-section a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-section a:hover {
+    color: var(--amarelo-sol);
+    text-decoration: underline;
+}
+
+.footer-social {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(218, 187, 44, 0.2);
+    border: 1px solid var(--amarelo-sol);
+    border-radius: var(--radius-full);
+    color: var(--amarelo-sol);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.social-icon:hover {
+    background: var(--amarelo-sol);
+    color: var(--verde-amazonia);
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(218, 187, 44, 0.3);
+    padding-top: var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.footer-copyright {
+    font-size: var(--font-size-sm);
+    opacity: 0.8;
+}
+
+.footer-links {
+    display: flex;
+    list-style: none;
+    gap: var(--spacing-lg);
+}
+
+.footer-links a {
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-links a:hover {
+    color: var(--amarelo-sol);
+}
+
+/* ============== CONTAINER PADRÃO ============== */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+}
+
+/* ============== SEÇÕES ============== */
+.section {
+    padding: var(--spacing-2xl) 0;
+}
+
+.section-title {
+    font-size: var(--font-size-2xl);
+    color: var(--verde-amazonia);
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+    padding-bottom: var(--spacing-md);
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--amarelo-sol), transparent);
+}
+
+/* ============== RESPONSIVIDADE ============== */
+@media (max-width: 768px) {
+    .header-container {
+        flex-wrap: wrap;
+    }
+
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background: var(--verde-escuro);
+        padding: var(--spacing-lg);
+        gap: var(--spacing-md);
+    }
+
+    .nav-links.active {
+        display: flex;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .nav-main {
+        width: 100%;
+        order: 3;
+    }
+
+    header {
+        padding: var(--spacing-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: var(--font-size-base);
+    }
+
+    .user-info {
+        display: none;
+    }
+
+    .section-title {
+        font-size: var(--font-size-xl);
+    }
+}
+
+/* ============== CLASSES UTILITÁRIAS ============== */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-bold {
+    font-weight: 700;
+}
+
+.text-muted {
+    color: var(--cinza-escuro);
+}
+
+.mt-lg {
+    margin-top: var(--spacing-lg);
+}
+
+.mb-lg {
+    margin-bottom: var(--spacing-lg);
+}
+
+.mt-xl {
+    margin-top: var(--spacing-xl);
+}
+
+.mb-xl {
+    margin-bottom: var(--spacing-xl);
+}
+
+.p-lg {
+    padding: var(--spacing-lg);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.invisible {
+    visibility: hidden;
+}

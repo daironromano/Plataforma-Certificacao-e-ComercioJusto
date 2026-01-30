@@ -1,3 +1,8 @@
+# Limpeza
+.env
+banco_de_dados/
+
+
 # Python & Django
 __pycache__/
 *.pyc
